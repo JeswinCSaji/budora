@@ -1,0 +1,54 @@
+{% load static %}
+
+
+<html>
+<head>
+    <link rel="stylesheet" href="{% static 'css/register.css' %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="{% static 'js/validation.js' %}"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">    <title>Register</title>
+    
+</head>
+
+<body>
+    <nav class="Logo">
+        <div class="container">
+            <img id="logoimg" src="{% static 'images/Budoralogo.png' %}">
+            <a id="logoname" href="#">BUDORA </a>
+        </div>
+    </nav>
+        <div class="signup">
+            
+                <div id="signuptext">
+                    <p id="signuptext1">sign up</p>
+                    <hr id="signuptext2">
+                    <h2 id="signuptext3">Hello there!</h2>
+                </div>
+                    <form class="signup-form" style=" width:300px"  method="post" >     
+                        {% csrf_token %}        
+                            <input id="fn" class="signupelement" placeholder="Name" name="username" required>
+                            <span id="fnspan" style="font-size: small;"></span> <br>                       
+                            <input id="mail" class="signupelement" placeholder="Email" name="email" required>
+                            <span id="emspan" style="font-size: small;"></span> <br>                                              
+                            <input id="pass"  class="signupelement" placeholder="Password" name="pwd" type="password" required>
+                            <span id="pspan" style="font-size: small;"></span>  <br>
+                            <input id="cpass"  class="signupelement"  placeholder="Confirm Password" name="cpwd" type="password">
+                            <span id="cpspan" style="font-size: small;"></span>  <br>
+                            {% comment %} <div class="icon-container">
+                                <a href="#"><span id="icon" class="fab fa-google" style="color: red"></span></a> <!-- Google icon placeholder -->
+                                <a href="#"><span id="icon" class="fab fa-facebook"  style="color: blue"></span></a> <!-- Facebook icon placeholder -->
+                                <a href="#"><span id="icon" class="fab fa-twitter" style="color: #1DA1F2"></span></a> <!-- Twitter icon placeholder -->
+                            </div> {% endcomment %}
+                            <button class="signupbtn" type="submit"  >Sign Up</button>
+                           
+                            <p id="signupelement2">Already have an account? <a href="login.html" style="color: #27350F; text-decoration: none">signin</a></p>
+                    </form>
+                <div class="signupimg">
+                    <img id="img1" src="{% static 'images/9.png' %}">
+                </div>               
+        </div>
+</body>
+</html>
+
+
