@@ -48,7 +48,7 @@ $(document).ready(function () {
    }
    else if(!pwd_expression.test(password))
     {
-        $("#pspan").html("Use correct Password Format").css("color", "red");
+        $("#pspan").html("Uppercase letter, Symbol and number needed").css("color", "red");
 
     }
     else {

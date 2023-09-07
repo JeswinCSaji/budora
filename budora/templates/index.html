@@ -31,7 +31,6 @@
     <!-- Template Stylesheet -->
     <link href="{% static 'css/style.css' %}" rel="stylesheet">
 </head>
-
 <body>
     <!-- Spinner Start -->
     <div id="spinner" class="show bg-white position-fixed translate-middle w-100 vh-100 top-50 start-50 d-flex align-items-center justify-content-center">
@@ -55,27 +54,25 @@
                     <div class="navbar-nav ms-auto" style="text-decoration: none;
                     text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px;">
                         <a href="#" class="nav-item nav-link active">Home</a>
-                        <a href="#" class="nav-item nav-link">About</a>
-                        <a href="#" class="nav-item nav-link">Products</a>
+                        <a href="#" class="nav-item nav-link">Plants</a>
+                        <a href="#" class="nav-item nav-link">Rental</a>
                         <a href="#" class="nav-item nav-link">Store</a>
-                         {% if user.is_authenticated %}
 
-                        <a class="nav-item nav-link" href="{% url 'login' %}">Logout</a> 
-                        {% else %}
-                        <p>You are not logged in.</p>
-                        <a class="nav-item nav-link" href="register.html">Register</a>
-                        <a class="nav-item nav-link" href="login.html">Login</a>
-                       {% endif %}
+                        {% comment %} {% if request.session.username %} {% endcomment %}
+                        {% if user.is_authenticated %}
+
                         <div class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
+                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user-circle"></i></a>
                             <div class="dropdown-menu bg-light rounded-0 m-0">
-                                <a href="feature.html" class="dropdown-item">Features</a>
-                                <a href="blog.html" class="dropdown-item">Blog Article</a>
-                                <a href="testimonial.html" class="dropdown-item">Testimonial</a>
-                                <a href="404.html" class="dropdown-item">404 Page</a>
+                                <p class="dropdown-item">{{ user.userprofile.name }}</p>
+                                <a href="{% url 'profile' %}" class="dropdown-item">Profile</a>
+                                <a href="{% url 'loggout' %}" class="dropdown-item">Logout</a>
                             </div>
                         </div>
-                        <a href="contact.html" class="nav-item nav-link">Contact</a>
+                        {% else %}
+                        <a  class="nav-item nav-link" href="{% url 'loginu' %}">Login <i class="fa fa-arrow-right"></i></a>
+                        {% endif %}
+                        
                     </div>
                     <div class="border-start ps-4 d-none d-lg-block">
                         <button type="button" class="btn btn-sm p-0"><i class="fa fa-search"></i></button>
@@ -86,11 +83,12 @@
     </div>
     <!-- Navbar End -->
 
-    {% comment %} {% if user.is_authenticated %}
-    <p>Welcome, {{ user.username }}!</p>
-    {% endif %} {% endcomment %}
+ 
     <!-- Carousel Start -->
     <div class="container-fluid px-0 mb-5" >
+        {% if user.is_authenticated %}
+        <h1 class=" text animated zoomIn" style="font-family: sans-serif; text-align: left; font-size: x-large; margin-left: 8%; font-weight: lighter;">Welcome,<p>{{ user.userprofile.name }}</p></h1>
+        {% endif %}
         <div id="header-carousel" class="carousel slide carousel-fade" data-bs-ride="carousel" >
             <div class="carousel-inner">
                 <div class="carousel-item active">
@@ -102,7 +100,7 @@
                                 <!-- style="margin-right: 0px; border-style:groove;" -->
                                 <div class="col-lg-6 text" >
                                     <!-- style="margin-left: 100px; border-style:groove;" -->
-                                    <p class="text animated zoomIn" style="text-align: left; align-items: end; line-height: 1.1; color: rgba(0, 0, 0, 0.863); font-size: 70px; font-weight: 1000; " >Grow your own <strong style="color: #27350F;">Favorite</strong> plant</p>
+                                    <p class="text animated zoomIn" id="carouselcontent" style="text-align: left; align-items: end; line-height: 1.1; color: rgba(0, 0, 0, 0.863);  font-weight: 1000; " >Grow your own <strong style="color: #27350F;">Favorite</strong> plant</p>
                                     <h1 class=" text animated zoomIn" style="font-family: sans-serif; text-align: left; font-size: xx-large; font-weight: lighter;">Make your life and your home environment healthy by buying your favorite plants</h1>
                                     <a href="" id="homebtn" class="btn btn-light rounded-pill animated zoomIn">View Collections</a>
                                 </div>
@@ -116,9 +114,9 @@
                         <div class="container">
                             <div>
                                 <div class="col-lg-6 text-center">
-                                    <p class="text animated zoomIn" style="text-align: left; align-items: end; line-height: 1.1; color: #27350F; font-size: 70px; font-weight: 1000;"> Plant <strong class="text-dark">Recommendation</strong></p>
-                                    <h1 class="display-1 text-dark mb-4 animated zoomIn" style="font-family: sans-serif; text-align: left; font-size: xx-large; font-weight: lighter;">Enhance Your Space with Health-Prioritized Plant Picks! Elevate your living environment with our personalized plant recommendations.</h1>
-                                    <a href="" id="homebtn" class="btn btn-light rounded-pill animated zoomIn">View Collections</a>
+                                    <p  id="carouselcontent" class="text animated zoomIn" style="text-align: left; align-items: end; line-height: 1.1; color: #27350F; font-weight: 1000;"> Plant <strong class="text-dark">Recommendation</strong></p>
+                                    <h1 class="display-1 text-dark mb-4 animated zoomIn" id="carcon" style="font-family: sans-serif; text-align: left; font-size: xx-large; font-weight: lighter;">Enhance Your Space with Health-Prioritized Plant Picks! Elevate your living environment with our personalized plant recommendations.</h1>
+                                    <a href="{% url 'plant_recommendation' %}" id="homebtn" class="btn btn-light rounded-pill animated zoomIn">View Collections</a>
                                 </div>
                             </div>
                         </div>

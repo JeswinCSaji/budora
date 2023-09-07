@@ -41,8 +41,14 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'user'
+    'user',
+    'django.contrib.sites', # must
+    'allauth', # must
+    'allauth.account', # must
+    'allauth.socialaccount', # must
+    'allauth.socialaccount.providers.google', # new
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -58,10 +64,6 @@ ROOT_URLCONF = 'budora.urls'
 
 
 
-AUTHENTICATION_BACKENDS = (
-   
-    'django.contrib.auth.backends.ModelBackend',
-)
 
 TEMPLATES = [
     {
@@ -74,6 +76,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                
             ],
         },
     },
@@ -131,8 +134,11 @@ STATIC_DIR=os.path.join(BASE_DIR,'static')
 STATIC_URL = 'static/'
 STATICFILES_DIRS=[STATIC_DIR,]
 
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR,'media')
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
+
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -144,3 +150,20 @@ EMAIL_HOST_USER = 'mailtoshowvalidationok@gmail.com'
 EMAIL_HOST_PASSWORD = 'qtwpnirvgsxzhtdo' 
 DEFAULT_FROM_EMAIL = 'mailtoshowvalidationok@gmail.com'
 
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+ACCOUNT_EMAIL_VERIFICATION = 'none'
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
+
+SOCIALACCOUNT_LOGIN_ON_GET=True
+ACCOUNT_EMAIL_VERIFICATION='none'

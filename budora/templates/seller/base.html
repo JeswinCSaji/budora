@@ -1,0 +1,251 @@
+{% load static %}
+
+<html>
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+
+    <!-- Template Stylesheet -->
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
+</head>
+<body style="font-family:  sans-serif; background-image: url({% static 'images/12.jpg' %}); background-repeat: no-repeat; background-size: cover;">
+<div class="container-fluid bg-white sticky-top">
+<div class="container">
+<nav class="navbar navbar-expand-lg navbar-light py-2 py-lg-2 ">
+    <a href="index.html" class="navbar-brand" id="budoralogo" >
+        <img class="img-fluid" src="{% static 'images/8.png' %}" alt="Logo">
+        <a id="logoname" href="#">BUDORA </a>
+    </a>
+    <p style="margin-left: 8%; margin-top: 1.5%; ">SELLER</p>
+    <button type="button" class="navbar-toggler ms-auto me-0" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+            
+            <div class="navbar-nav ms-auto" style="text-decoration: none;
+                    text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px;">
+                   <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link active" id="certification-tab" data-bs-toggle="tab" href="#certification" role="tab" aria-controls="certification" aria-selected="true" style="font-weight: lighter; ">Certification Approval</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="add-products-tab" data-bs-toggle="tab" href="#add-products" role="tab" aria-controls="add-products" aria-selected="false" style="font-weight: lighter;">Add Products</a>
+                    </li>
+                    </ul>
+                
+                        {% if user.is_authenticated %}
+                        <div class="nav-item dropdown" style="margin-left: 50px;">
+                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user-circle"></i></a>
+                            <div class="dropdown-menu bg-light rounded-0 m-0">
+                                <p class="dropdown-item">{{ user.userprofile.name }}</p>
+                                <a href="{% url 'profile' %}" class="dropdown-item">Profile</a>
+                                <a href="{% url 'seller_loggout' %}" class="dropdown-item">Logout</a>
+                            </div>
+                        </div>
+                        {% else %}
+                        <a  class="nav-item nav-link" href="{% url 'loginu' %}" style="font-weight: lighter;">Login <i class="fa fa-arrow-right"></i></a>
+                        {% endif %} 
+            </div>
+        </div>
+</nav>
+</div>
+</div>
+<div class="container mt-4">
+    {% block content %}
+    {% endblock %}
+</div>
+<!-- Tab content -->
+<div class="tab-content mt-4">
+    <div class="tab-pane fade show active" id="certification">
+    <div class="certification-content">
+      <h2>Certification Approval</h2>
+      {% if existing_certification %}
+    <!-- Display existing certification details -->
+    <p>You have already entered your certification details.</p>
+  {% else %}
+    <!-- Display the certification form -->
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {{ form.as_p|safe }}  <!-- Display the form fields with HTML markup -->
+      <button type="submit" class="btn btn-primary">Submit Certification Request</button>
+    </form>
+  {% endif %}
+    </div>
+</div>
+    <div class="tab-pane fade" id="add-products">
+    <div class="add-products-content">
+      <h2>Add Products</h2>
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <div class="form-group mb-3" style="margin-top: 30px;">
+            <label for="product_name">Product Name:</label>
+            <input type="text" id="product_name" name="product_name" class="form-control">
+        </div>
+        <div class="form-group mb-3" style="margin-top: 10px;">
+            <label for="product_description">Product Description:</label>
+            <textarea id="product_description" name="product_description" class="form-control" rows="4"></textarea>
+        </div>
+        <div class="form-group mb-3" style="margin-top: 10px;">
+          <label for="product_price">Product Price:</label>
+                  {# Use the first category's default product price as the default value #}
+                  <input type="text" id="product_price" name="product_price" class="form-control" value="{{ category.product_price }}" >
+      </div>        
+        
+      <div class="form-group mb-3" style="margin-top: 10px;">
+        <label for="select_category">Select Category:</label>
+        <select id="select_category" name="select_category" class="form-control" required>
+          <option value="">Select Category</option>
+          {% for category in categories %}
+              <option value="{{ category.id }}">{{ category.category_name }}</option>
+          {% endfor %}
+      </select>
+      
+    </div>      
+        <div class="form-group mb-3" style="margin-top: 10px;">
+          <label for="product_image">Category Image:</label>
+          <input type="file" id="product_image" name="product_image" accept="image/*">
+      </div>
+        <input type="hidden" name="product_form" value="1">
+        <button type="submit" style="margin-top: 30px;" class="btn btn-primary" id="add-product-button">Add Product</button>
+    </form>      
+    {% comment %} <button type="submit" style="margin-top: 30px;" class="btn btn-primary" id="add-product-button-{{ application.id }}" disabled>Add Product</button> {% endcomment %}
+  </div>
+  </div>
+  </div>
+</div>
+
+</body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<style>
+    #budoralogo
+{
+    margin-left: 4.6%;
+    margin-top: 0.4%;
+}
+
+    @media (max-width: 991.98px) {
+        #budoralogo
+    {
+        margin-top: 7px;
+        margin-left: 11.5%;
+        height: 10px; 
+        width: 33px;
+    }
+    #logoname
+    {
+        font-size: medium;
+    }
+    }
+    
+    .nav-tabs {
+        box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px;
+       margin-top: 15px;
+       height: 40px;
+       padding-left: 40px;
+        font-weight: lighter;/* Change to your desired color */
+        align-items: center;
+        align-content: center;
+    }
+
+    .nav-tabs .nav-link {
+       
+        color: #fff; /* Change to your desired text color */
+    }
+
+    .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
+    
+    
+    padding-top: 5px;
+    border-radius: 0px;
+    padding-bottom: 4px;
+    box-shadow: black 0px 3px 0px;
+    
+    }
+
+    .nav-tabs .nav-link {
+        
+    border: none; /* Remove the default border */
+    }
+
+    .nav-tabs .nav-item {
+    margin-right: 10px; /* Adjust as needed */
+    }
+
+    .nav-tabs .nav-link:hover {
+        padding-top: 5px;
+    border-radius: 0px;
+    padding-bottom: 2px;
+    
+    color: #fff; 
+    }
+
+    /* Style the Certification Approval content */
+.certification-content {
+    align-items: center; 
+    width: 35%;        
+    border-width: 2px;
+    margin-left: 5%;
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px; 
+    padding-left: 5%; 
+    padding-top: 5%; 
+                padding-bottom: 5%;
+                margin-right: 5%;
+                
+}
+
+/* Style the Add Products content */
+.add-products-content {
+    align-items: center; 
+    width: 35%;        
+    border-width: 2px;
+    margin-left: 5%;
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px; 
+    padding-left: 2%; 
+    padding-right: 2%; 
+    padding-top: 2%; 
+                padding-bottom: 2%;
+                margin-right: 5%;
+}
+
+
+.certification-content h2,
+.add-products-content h2 {
+    color: #27350F; /* Change to your desired title color */
+}
+
+.certification-content p {
+    color: #555; /* Change to your desired text color */
+}
+
+/* Customize buttons within the content */
+.certification-content button,
+.add-products-content button {
+    background-color: #27350F;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.certification-content button:hover,
+.add-products-content button:hover {
+    background-color: #456731; /* Change to your desired hover color */
+}
+
+
+@media (max-width: 991.98px) {
+    .certification-content {
+    width: 90%; 
+                
+}
+.add-products-content {
+    width: 90%; 
+}
+
+    }
+
+</style>
+</html>
