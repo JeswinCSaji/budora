@@ -1,0 +1,161 @@
+
+
+{% extends 'userprofile/base.html' %}
+{% load static %}
+
+<style>
+    .proform
+    {
+                align-items: center; 
+                width:90%; 
+                border-width: 2px;
+                margin-left: 20%;
+                box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px; 
+                padding-left: 5%; 
+                padding-top: 5%; 
+                padding-bottom: 5%;
+    }
+
+    #cardelement
+    {
+        border-color: #27350F;
+                        border-style:solid;
+                        border-width: 1px;
+                        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+                        width: 200px;
+                        height: 40px;
+                        padding: 10px;
+    }
+</style>
+
+<body style="font-family:  sans-serif; ">
+{% block content %}
+    <form method="post" enctype="multipart/form-data"  style=" display: flex;">
+        {% csrf_token %}
+        <div style="align-items: center; 
+        background-color: white;
+        border-width: 2px;
+        box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px; 
+        padding-left: 3%; 
+        width: 280px;
+        height: 320px;
+        padding-top: 3%; 
+        padding-bottom: 3%;">
+        
+        {% if user.is_superuser %}
+            <h5 style="margin-left: 32%;"> Admin </h5>
+            {% elif user.is_staff %}
+            <h5 style="margin-left: 32%;"> Seller </h5>
+            {% else  %}
+            <h5 style="margin-left: 35%;"> User </h5>
+            {% endif  %}
+        <!-- {{ user.profile.profile_picture.url }} -->
+        {% if user.userprofile.profile_pic %}
+      <img src="{{user.userprofile.profile_pic.url }}" alt="profile pic" class="card-img-top" style=" width:200px; height:200px; border-radius: 180px;"/>
+      {% else %}
+    <!-- Display a default profile picture or a message if no profile picture is available -->
+      <img src="{% static 'images/usericon.png' %}" class="card-img-top" style=" width:200px; height:200px; border-radius: 180px;" />
+      {% endif %}
+        <h5 style="margin-top:20px ;">{{ user.username }}</h5>
+
+        </div>
+                <div style="align-items: center;
+                background-color: white; 
+                border-width: 2px;
+                margin-left: 3%;
+                box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px; 
+                padding-left: 5%; 
+                width: 430px;
+                padding-top: 4%; 
+                padding-bottom: 4%;">
+                    {% csrf_token %}
+                    <!-- <div>
+                        <label for="profile_picture" class="form-label">Profile Picture:</label>
+                        <input type="file"  class="form-control"  id="cardelement" name="profile_picture" style="border-color: #27350F;
+                        border-style:solid;
+                        border-width: 1px;
+                        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+                        width: 300px;
+                        height: 40px;
+                        padding: 10px;">
+                    </div> -->
+                    <div>
+                        <label for="name" class="form-label">Name:</label>
+                        <p  class="form-control" id="cardelement" style="border-color: #27350F;background-color: white; border:none;
+                        border-bottom:solid ;
+                        border-width: 1px;
+                        border-radius: 0px;
+                        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+                        width: 300px;
+                        height: 40px;
+                        padding: 10px;">{{ user.userprofile.name }}</p>
+                    </div>
+                    <div>
+                        <label for="email" class="form-label">Email:</label>
+                        <p type="email"  class="form-control" id="cardelement" style="border-color: #27350F;background-color: white;border:none;
+                        border-bottom:solid ;
+                        border-radius: 0px;
+                        border-width: 1px;
+                        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+                        width: 300px;
+                        height: 40px;
+                        padding: 10px;">{{ request.user.email }}</p>
+                    </div>
+                    <!-- <div>
+                        <label for="gender" class="form-label">Gender:</label>
+                        <select class="form-control" id="cardelement" name="gender" style="border-color: #27350F;
+                        border-style:solid;
+                        border-width: 1px;
+                        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+                        width: 300px;
+                        height: 40px;
+                        padding: 10px;">
+                            <option value="M" {% if user.profile.gender == 'M' %}selected{% endif %}>Male</option>
+                            <option value="F" {% if user.profile.gender == 'F' %}selected{% endif %}>Female</option>
+                        </select>
+                    </div> -->
+                    <div>
+                        <label for="phone_number" class="form-label" >Phone Number:</label>
+                        <p class="form-control" id="cardelement" style="border-color: #27350F; background-color: white;border:none;
+                        border-bottom:solid ;
+                        border-radius: 0px;
+                        border-width: 1px;
+                        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+                        width: 300px;
+                        height: 40px;
+                        padding: 10px;">{{ user.userprofile.phone_number }}</p>
+                    </div>
+                    <div>
+                        <label for="address" class="form-label">Address:</label>
+                        <p class="form-control" id="cardelement"  style="border-color: #27350F; background-color: white;border:none;
+                        border-bottom:solid ;
+                        border-radius: 0px;
+                        border-width: 1px;
+                        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+                        width: 300px;  
+                        height:100px;     
+                        padding: 10px;">{{ user.userprofile.address }}</p>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="background-color: #27350F;
+                    border-radius: 100px;
+                    margin-top: 10px; 
+                    margin-left: 90px;  
+                    color: white;
+                    width: 100px;
+                    transition: 0.5s;
+                    height: 35px;
+                    border-style: none;"><a style="color: white; text-decoration: none;"  href="{% url 'edit_profile' %}">Update</a></button>
+                    
+                </div>
+    </form>
+    </div>
+    <div class="col-md-8">
+        <!-- Other content related to user profile -->
+    </div>
+</div>
+{% endblock %}
+</body>
+
+
+
+

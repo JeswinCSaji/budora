@@ -1,0 +1,245 @@
+
+
+
+{% extends 'userprofile/base.html' %}
+{% load static %}
+<body style="font-family:  sans-serif; background-image: url({% static 'images/12.jpg' %}); background-repeat: no-repeat; background-size: cover;">
+    {% block content %}
+                <form  method="post" style="align-items: center;
+                background-color: white; 
+                border-width: 2px;
+                margin-left: 15%;
+                
+                box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px; 
+                padding-left: 2%; 
+                width: 350px;
+                padding-top: 2%; 
+                padding-bottom: 2%;" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <h5 style="margin-top:20px ;">username : {{ user.username }}</h5>
+                    <div>
+                        <label for="id_name"  class="form-label">Name:</label><br>
+                        <input type="text"  class="form-control"  id="id_name" value="{{ user.userprofile.name }}" name="name" style="border-color: #27350F;
+                        border-style:solid;
+                        border-width: 1px;
+                        margin-top: 5px;
+                        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+                        width: 300px;
+                        height: 40px;
+                        padding: 10px;">
+                        <span id="nameError" class="error"></span>
+
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <label for="id_profile_pic"  class="form-label">Profile Picture:</label><br>
+                        <input type="file"  class="form-control"  id="id_profile_pic" name="profile_picture" style="border-color: #27350F;
+                        border-style:solid;
+                        border-width: 1px;
+                        margin-top: 5px;
+                        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+                        width: 300px;
+                        height: 40px;
+                        padding: 10px;">
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <label for="id_email"  class="form-label">Email:</label><br>
+                        <input type="email"  class="form-control" id="id_email" name="email" value="{{ user.email }}" style="border-color: #27350F;
+                        border-style:solid;
+                        border-width: 1px;
+                        margin-top: 5px;
+                        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+                        width: 300px;
+                        height: 40px;
+                        padding: 10px;">
+                        <span id="emailError" class="error"></span>
+                    </div>
+                    <!-- <div>
+                        <label for="date_of_birth" class="form-label">Date of Birth:</label>
+                        <input type="date" class="form-control" id="cardelement" name="date_of_birth" value="{{ user.profile.date_of_birth }}" style="border-color: #27350F;
+                        border-style:solid;
+                        border-width: 1px;
+                        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+                        width: 300px;
+                        height: 40px;
+                        padding: 10px;">
+                    </div>
+                    <div>
+                        <label for="gender" class="form-label">Gender:</label>
+                        <select class="form-control" id="cardelement" name="gender" style="border-color: #27350F;
+                        border-style:solid;
+                        border-width: 1px;
+                        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+                        width: 300px;
+                        height: 40px;
+                        padding: 10px;">
+                            <option value="M" {% if user.profile.gender == 'M' %}selected{% endif %}>Male</option>
+                            <option value="F" {% if user.profile.gender == 'F' %}selected{% endif %}>Female</option>
+                        </select>
+                    </div> -->
+                    <div style="margin-top: 20px;">
+                        <label for="id_mobile" class="form-label" >Phone Number:</label><br>
+                        <input class="form-control" id="id_mobile" name="phone_number" value="{{ user.userprofile.phone_number }}" style="border-color: #27350F;
+                        margin-top: 5px;
+                        border-style:solid;
+                        border-width: 1px;
+                        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+                        width: 300px;
+                        height: 40px;
+                        padding: 10px;">
+                        <span id="mobileError" class="error"></span>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <label for="id_address"  class="form-label">Address:</label><br>
+                        <input type="text" class="form-control" id="id_address" value="{{ user.userprofile.address }}" name="address" style="border-color: #27350F;
+                        border-style:solid;
+                        border-width: 1px;
+                        margin-top: 5px;
+                        box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+                        width: 300px;                        
+                        padding: 10px;">
+                        <span id="addressError" class="error"></span>
+
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="background-color: #27350F;
+                    border-radius: 100px;
+                    margin-top: 10px; 
+                    margin-left: 90px; 
+                    margin-top: 20px; 
+                    color: white;
+                    width: 100px;
+                    transition: 0.5s;
+                    height: 35px;
+                    border-style: none;">Save</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <!-- Other content related to user profile -->
+    </div>
+</div>
+{% endblock %}
+</body>
+<script>
+
+    const addressInput = document.getElementById("id_address");
+  
+    addressInput.addEventListener("input", function() {
+        const address = addressInput.value;
+        let errorMessage = "";
+  
+        // Check if the address is empty
+        if (address.trim() === "") {
+            errorMessage = "Address is required";
+        } else if (address.length < 5) {
+            errorMessage = "Address is too short (minimum 5 characters)";
+        } else if (address.length > 100) {
+            errorMessage = "Address is too long (maximum 100 characters)";
+        } else if (/[^a-zA-Z0-9\s,#.\-()]/.test(address)) {
+            errorMessage = "Invalid characters in the address";
+        } else if (!/^[a-zA-Z0-9\s,#.\-()]+$/.test(address)) {
+            errorMessage = "Special characters should be used correctly";
+        }
+  
+        document.getElementById("addressError").textContent = errorMessage;
+    });
+  
+    const nameInput = document.getElementById("id_name");
+  
+      nameInput.addEventListener("input", function() {
+          const name = nameInput.value.trim(); // Remove leading/trailing whitespace
+          let errorMessage = "";
+  
+          if (!/^[A-Z]/.test(name)) {
+            errorMessage =  "First letter should be a capital letter";
+          }
+          else if (/\d/.test(name)) {
+              errorMessage = "Numbers are not allowed in the name.";
+          } 
+          else if (/[^A-Za-z\s']/g.test(name)) {
+              errorMessage = "Special characters are not allowed in the name.";
+          } 
+          else if (name.length > 255) {
+              errorMessage = "Name is too long (maximum 255 characters).";
+          } 
+          else if (name.split(' ').length > 3) {
+              errorMessage = "Name should have at most three parts.";
+          } 
+          else if (containsAlphabetSequence(name)) {
+              errorMessage = "Alphabet sequences are not allowed in the name.";
+          }
+           else if (isAscendingOrDescendingSequence(name)) {
+              errorMessage = "Ascending or descending sequences are not allowed in the name.";
+          } 
+          else if (/[A-Z]{2,}/.test(name)) {
+              errorMessage = "No consecutive uppercase letters are allowed in the name.";
+          }
+  
+          document.getElementById("nameError").textContent = errorMessage;
+      });
+  
+      function containsAlphabetSequence(str) {
+          return /abcdefghijklmnopqrstuvwxyz/i.test(str);
+      }
+  
+      function isAscendingOrDescendingSequence(str) {
+          const ascending = 'abcdefghijklmnopqrstuvwxyz';
+          const descending = 'zyxwvutsrqponmlkjihgfedcba';
+          return ascending.includes(str.toLowerCase()) || descending.includes(str.toLowerCase());
+      }
+  
+  
+  const emailInput = document.getElementById("id_email");
+  
+  emailInput.addEventListener("input", function() {
+      const email = emailInput.value;
+      let errorMessage = "";
+  
+      if (!/^\S+@\S+\.\S+$/.test(email)) {
+          errorMessage = "Invalid email address";
+      } else if (email.length > 320) {
+          errorMessage = "Email address is too long";
+      } else if (email.includes("..")) {
+          errorMessage = "Consecutive periods are not allowed";
+      } else if (email.startsWith(".") || email.endsWith(".")) {
+          errorMessage = "Email address cannot start or end with a period";
+      } else if (/[A-Z]/.test(email)) {
+          errorMessage = "Capital letters are not allowed";
+      }
+  
+      document.getElementById("emailError").textContent = errorMessage;
+  });
+  
+  
+  
+  document.addEventListener("DOMContentLoaded", function () {
+          const mobileInput = document.getElementById("id_mobile");
+  
+          mobileInput.addEventListener("input", function () {
+              const input = mobileInput.value;
+              let errorMessage = "";
+  
+              const sanitizedInput = input.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+  
+              if (sanitizedInput.length !== 0 && sanitizedInput.length !== 10) {
+                  errorMessage = "Should be 10 digits";
+              } else if (sanitizedInput.length > 0 && !/^[6-9]/.test(sanitizedInput)) {
+                  errorMessage = "Number should start with 6, 7, 8, or 9";
+              } else if (sanitizedInput.length === 10) {
+                  if (/(\d)\1{9}/.test(sanitizedInput)) {
+                      errorMessage = "Not a valid SIM number";
+                  } else if (/(\d)\1{5,}/.test(sanitizedInput)) {
+                      errorMessage = "Invalid number with repeating consecutive digits";
+                  } else if (/(\d{2})\1{2,}/.test(sanitizedInput)) {
+                      errorMessage = "Invalid number with repeating sequences";
+                  }
+              }
+  
+              var formattedInput = sanitizedInput.replace(/(\d{3})(\d{4})(\d{3})/, '$1-$2-$3');
+              mobileInput.value = formattedInput;
+  
+              document.getElementById("mobileError").textContent = errorMessage;
+          });
+      });
+  </script>

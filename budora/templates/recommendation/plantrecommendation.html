@@ -1,0 +1,86 @@
+{% extends 'recommendation/base.html' %}
+
+{% load static %}
+<html>
+<head>
+    <title>Indoor Plant Recommendation Questionnaire</title>
+    <link rel="stylesheet" href="{% static 'css/plantrecommendation.css' %}">
+</head>
+<body style="background-image: url({% static 'images/5.png' %}); padding-bottom: 80px;">
+    {% block content %}
+    <div class="container">
+        <h1 style="color: #27350F;
+        text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px;">Indoor Plant Recommendation Questionnaire</h1>
+        <form  method="POST">
+            <div class="question" style="margin-top: 40px;">
+                <p>1. Air Quality Improvement:</p>
+                <label class="radio-label"><input type="radio" name="air_quality" value="1"> Not Important</label>
+                <label class="radio-label"><input type="radio" name="air_quality" value="2"> Slightly Important</label>
+                <label class="radio-label"><input type="radio" name="air_quality" value="3"> Moderately Important</label>
+                <label class="radio-label"><input type="radio" name="air_quality" value="4"> Very Important</label>
+                <label class="radio-label"><input type="radio" name="air_quality" value="5"> Extremely Important</label>
+            </div>
+
+            <div class="question" style="margin-top: 20px;">
+                <p>2. Stress Reduction:</p>
+                <label class="radio-label"><input type="radio" name="stress_reduction" value="1"> Not Important</label>
+                <label class="radio-label"><input type="radio" name="stress_reduction" value="2"> Slightly Important</label>
+                <label class="radio-label"><input type="radio" name="stress_reduction" value="3"> Moderately Important</label>
+                <label class="radio-label"><input type="radio" name="stress_reduction" value="4"> Very Important</label>
+                <label class="radio-label"><input type="radio" name="stress_reduction" value="5"> Extremely Important</label>
+            </div>
+
+            <div class="question" style="margin-top: 20px;">
+                <p>3. Sleep Quality Improvement:</p>
+                <label class="radio-label"><input type="radio" name="sleep_quality" value="1"> Not Important</label>
+                <label class="radio-label"><input type="radio" name="sleep_quality" value="2"> Slightly Important</label>
+                <label class="radio-label"><input type="radio" name="sleep_quality" value="3"> Moderately Important</label>
+                <label class="radio-label"><input type="radio" name="sleep_quality" value="4"> Very Important</label>
+                <label class="radio-label"><input type="radio" name="sleep_quality" value="5"> Extremely Important</label>
+            </div>
+
+            
+            <div class="question" style="margin-top: 20px;">
+                <p>4. Light Requirements:</p>
+                <label class="radio-label"><input type="radio" name="light_requirements" value="Low Light"> Low Light</label>
+                <label class="radio-label"><input type="radio" name="light_requirements" value="Moderate Light"> Moderate Light</label>
+                <label class="radio-label"><input type="radio" name="light_requirements" value="High Light"> High Light</label>
+            </div>
+            
+            <div class="question" style="margin-top: 20px;">
+                <p>5. Watering Frequency:</p>
+                <label class="radio-label"><input type="radio" name="water_needs" value="Weekly"> Weekly</label>
+                <label class="radio-label"><input type="radio" name="water_needs" value="Bi-weekly"> Bi-weekly</label>
+                <label class="radio-label"><input type="radio" name="water_needs" value="Monthly"> Monthly</label>
+            </div>
+            
+            <div class="question" style="margin-top: 20px;">
+                <p>6. Toxicity Concerns:</p>
+                <label class="radio-label"><input type="radio" name="toxicity_concerns" value="Yes"> Yes</label>
+                <label class="radio-label"><input type="radio" name="toxicity_concerns" value="No"> No</label>
+            </div>
+            <div class="question" style="margin-top: 20px;">
+                <p>7. Preferred Indoor Locations:</p>
+                <label class="checkbox-label"><input type="checkbox" name="location[]" value="Living Room"> Living Room</label>
+                <label class="checkbox-label"><input type="checkbox" name="location[]" value="Bedroom"> Bedroom</label>
+                <label class="checkbox-label"><input type="checkbox" name="location[]" value="Kitchen"> Kitchen</label>
+                <label class="checkbox-label"><input type="checkbox" name="location[]" value="Office"> Office</label>
+                <label class="checkbox-label"><input type="checkbox" name="location[]" value="Dining Hall"> Dining Hall</label>
+                <!-- <label class="checkbox-label"><input type="checkbox" name="location[]" value="Other"> Other (please specify)</label> -->
+                <!-- <input type="text" name="other_location" placeholder="Specify other location"> -->
+            </div>
+
+            <button type="submit" style="margin-top: 20px; background-color: #27350F;
+            border-radius: 100px;
+              
+            color: white;
+            width: 100px;
+            transition: 0.5s;
+            height: 35px;
+            border-style: none;
+            ">Submit</button>
+        </form>
+    </div>
+</body>
+{% endblock %}
+</html>
