@@ -26,7 +26,7 @@
                     text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px;">
                    <ul class="nav nav-tabs" id="myTab" role="tablist">
                     <li class="nav-item" role="presentation">
-                        <a class="nav-link active" id="certification-tab" data-bs-toggle="tab" href="#certification" role="tab" aria-controls="certification" aria-selected="true" style="font-weight: lighter; ">Certification Approval</a>
+                        <a class="nav-link active" id="certification-tab" data-bs-toggle="tab" href="#certification" role="tab" aria-controls="certification" aria-selected="true" style="font-weight: lighter; ">Licence Approval</a>
                     </li>
                     <li class="nav-item" role="presentation">
                         <a class="nav-link" id="add-products-tab" data-bs-toggle="tab" href="#add-products" role="tab" aria-controls="add-products" aria-selected="false" style="font-weight: lighter;">Add Products</a>
@@ -58,7 +58,7 @@
 <div class="tab-content mt-4">
     <div class="tab-pane fade show active" id="certification">
     <div class="certification-content">
-      <h2>Certification Approval</h2>
+      <h2>Store Licence Approval</h2>
       {% if existing_certification %}
     <!-- Display existing certification details -->
     <p>You have already entered your certification details.</p>
@@ -67,7 +67,7 @@
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
       {{ form.as_p|safe }}  <!-- Display the form fields with HTML markup -->
-      <button type="submit" class="btn btn-primary">Submit Certification Request</button>
+      <button type="submit" class="btn btn-primary">Submit</button>
     </form>
   {% endif %}
     </div>

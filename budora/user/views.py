@@ -55,6 +55,8 @@ def loginu(request):
             request.session['username'] = user.email
             if user.is_staff:
                 return redirect('seller_index')
+            elif user.is_superuser:
+                return redirect('admin_index')
             else:
                 return redirect('index.html')  # Redirect other users to index.html
         else :   

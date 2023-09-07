@@ -26,11 +26,10 @@ class Seller(models.Model):
 class Certification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
     certification_image = models.ImageField(upload_to='certification_image/', null=True, blank=True)
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
+    owner_name = models.CharField(max_length=100)  # Change 'first_name' to 'owner_name'
+    store_name = models.CharField(max_length=100)  # Add 'store_name' field
     expiry_date_from = models.DateField()
     expiry_date_to = models.DateField()
-    certification_authority = models.CharField(max_length=200)
     timestamp = models.DateTimeField(auto_now_add=True)
 
 class Application(models.Model):
