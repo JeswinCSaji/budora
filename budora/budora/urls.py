@@ -29,6 +29,8 @@ urlpatterns = [
     path('logout/', views.loggout, name='loggout'),
     path('accounts/', include('allauth.urls')),
 
+    path('admin_index', views.admin_index, name='admin_index'),
+
     path('seller_login.html', views.seller_login, name='seller_login.html'),
     path('seller_register', views.seller_register, name='seller_register'),
     path('approvalpending', views.approvalpending, name='approvalpending'),

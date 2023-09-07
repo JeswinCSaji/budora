@@ -6,11 +6,10 @@ class CertificationForm(forms.ModelForm):
         model = Certification
         fields = [
             'certification_image',  # Change the field name to 'certification_image'
-            'first_name',
-            'last_name',
+            'owner_name', 'store_name',
             'expiry_date_from',
             'expiry_date_to',
-            'certification_authority',
+            
         ]
     
     def __init__(self, *args, **kwargs):
