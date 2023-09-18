@@ -1,0 +1,106 @@
+{% extends 'admin/base1.html' %}
+{% block content %}
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/viewproducts.css' %}">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<div class="container-fluid"class="card-title mb-4" style="padding-bottom:5%;">
+    <h5 id="regtitle">Product Stock</h5>
+    <div class="card" style="border-style: none; box-shadow: black 0px 20px 30px -10px;">
+        <div class="card-body">
+            <div id="indiv">
+                <label for="role-filter" class="filter-label">Filter by Fill:</label>
+                <select id="role-filter" class="filter-select">
+                  <option value="all">All</option>
+                  <option value="none">Not Filled</option>
+                </select>
+                <br>
+                <br>
+                <!-- Search form -->
+                <form  class="search-form" id="searchform">
+                  <label for="username" class="search-label">Search by Plant Name:</label>
+                  <input type="text" id="username" name="username" class="search-input">
+                  <button type="submit" class="search-button">Search</button>
+                </form>
+                <br>
+                <br>
+              </div>
+              <p id="no-user-message" style="display: none;">No such Plant</p>
+          <div class="container mt-4">
+    <table class="user-list">
+        <thead>
+            <tr>
+                <th style="font-weight: bold;">Plant Name</th>
+                <th style="font-weight: bold;">Total Stock</th>
+                <th style="font-weight: bold;">Plant Description</th>
+                <th style="font-weight: bold;">Plant Price</th>
+                <th style="font-weight: bold;">Plant Image</th>
+                <th style="font-weight: bold;">Action</th>  <!-- Add this column -->
+            </tr>
+        </thead>
+        <tbody>
+            {% for summary in product_summaries %}
+                <tr>
+                    <td>{{ summary.product_name }}</td>
+                    <td>{{ summary.total_stock }}</td>
+                    <td>{{ summary.product_description }}</td>
+                    <td>{{ summary.product_price }}</td>
+                    <td>
+                        {% if summary.product_image %}
+                            <img src="{{ summary.product_image.url }}" alt="{{ summary.product_name }}" width="100">
+                        {% else %}
+                            No image available
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'edit_product_stock' summary.pk %}" class="btn btn-sm btn-primary">Edit</a><br>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+</div>
+</div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const input = document.querySelector('#username');
+      const roleFilter = document.querySelector('#role-filter');
+      const rows = document.querySelectorAll('.user-list tbody tr');
+      const noUserMessage = document.querySelector('#no-user-message');
+  
+      input.addEventListener('input', filterUsers);
+      roleFilter.addEventListener('change', filterUsers);
+  
+      function filterUsers() {
+        const searchTerm = input.value.toLowerCase();
+        const selectedRole = roleFilter.value;
+        let found = false; // Flag to track if a matching user is found
+  
+        rows.forEach(function (row) {
+          const username = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
+          const role = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+  
+          // Check if the user matches the selected role (or if all roles are selected)
+          if ((selectedRole === 'all' || role.includes(selectedRole)) &&
+            (searchTerm.length === 0 || username.includes(searchTerm))) {
+            row.style.display = 'table-row';
+            found = true; // Matching user found
+          } else {
+            row.style.display = 'none';
+          }
+        });
+  
+        // Show/hide "No such user" message
+        if (found) {
+          noUserMessage.style.display = 'none';
+        } else {
+          noUserMessage.style.display = 'block';
+        }
+      }
+    });
+  </script>
+
+{% endblock %}

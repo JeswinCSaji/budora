@@ -1,0 +1,49 @@
+{% extends 'seller/base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="card swing">
+      <div class="card-body">
+    <h2>Edit Product</h2>
+    <form method="POST">
+      {% csrf_token %}
+      <div class="form-group">
+        <label for="product_name">Plant Name:</label>
+        <input type="text" class="form-control" id="product_name" name="product_name" value="{{ product.product_name }}">
+      </div>
+      <div class="form-group">
+        <label for="product_description">Description:</label>
+        <textarea class="form-control" id="product_description" name="product_description">{{ product.product_description }}</textarea>
+      </div>
+      <div class="form-group " style="margin-top: 10px;">
+        <label for="select_category">Select Category:</label>
+        <select id="select_category" name="select_category" class="form-control" >
+            <option value="">Select Category</option>
+            {% for category in categories %}
+                <option value="{{ category.id }}">{{ category.category_name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+      <div class="form-group">
+        <label for="product_price">Price:</label>
+        <input type="text" class="form-control" id="product_price" name="product_price" value="{{ product.product_price }}">
+      </div>
+      <div class="form-group">
+        <label for="product_stock">Stock (in KG):</label>
+        <input type="text" class="form-control" id="product_stock" name="product_stock" value="{{ product.product_stock }}">
+      </div>
+      <div class="form-group">
+        <label for="product_image">Plant Image:</label>
+        <input type="file" class="form-control-file" id="product_image" name="product_image">
+        {% if product.product_image %}
+          <img src="{{ product.product_image.url }}" alt="{{ product.product_name }}" class="img-thumbnail" style="max-width: 150px; max-height: 150px;">
+        {% endif %}
+      </div>      
+      <button type="submit" href="{% url 'viewaddproduct' %}" class="btn btn-primary">Save Changes</button>
+      <button type="submit" href="{% url 'viewaddproduct' %}" class="btn btn-danger">Go Back</button>
+    </form>
+</div>
+</div>
+</div>
+{% endblock %}

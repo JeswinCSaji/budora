@@ -1,0 +1,41 @@
+{% extends 'admin/base1.html' %}
+{% load static %}
+{% block content %}
+<div class="container-fluid">
+  <div class="card">
+    <div class="card-body">
+        <h5 class="fw-semibold">Edit Category Details</h5>
+        <!-- edit_category.html -->
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="category_name">Category Name:</label>
+                <input type="text" id="category_name" name="category_name" value="{{ category.category_name }}" class="form-control">
+            </div>
+    
+            <div class="form-group">
+                <label for="category_description">Category Description:</label>
+                <textarea id="category_description" name="category_description" class="form-control">{{ category.category_description }}</textarea>
+            </div>
+    
+            <button href="{% url 'viewcategory' %}" type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+  </div>
+</div>
+
+<style>
+    /* Custom CSS styles */
+    .form-group {
+        margin-bottom: 20px; /* Add space between form groups (input fields) */
+    }
+
+    .form-group .btn {
+        margin-right: 10px; /* Add space to the right of the buttons */
+        line-height: 2; /* Adjust line height for better vertical alignment */
+    }
+
+    /* You can further customize the styles as needed */
+</style>
+
+{% endblock %}

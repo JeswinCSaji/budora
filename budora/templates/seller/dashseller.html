@@ -1,0 +1,176 @@
+{% extends 'seller/base.html' %}
+{% load static %}
+<html>
+<head>
+  <title>Seller Dashboard</title>
+
+</head>
+<style>
+  .certification-message {
+    font-size: 18px;
+    color: #333; /* Text color */
+    background-color: #f0f0f0; /* Background color */
+    padding: 10px; /* Add padding for spacing */
+    border: 1px solid #ccc; /* Add a border */
+    border-radius: 5px; /* Rounded corners */
+    text-align: center; /* Center the text */
+    margin: 20px 0; /* Add margin for spacing */
+}
+</style>
+<body>
+  {% block content %}
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!--  Main wrapper -->
+    <div class="body-wrapper" >
+      <div class="container-fluid" >
+        <div class="card" style="border-style: none; box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px; ">
+          <div class="card-body">
+            <h5 class="card-title fw-semibold mb-4">Store Licence Approval</h5>
+          {% if existing_certification %}
+
+            {% if existing_certification.is_approved == 'pending' %}
+            <p class="certification-message">You have already entered your Licence details.</p>
+
+            {% elif existing_certification.is_approved == 'approved' %}
+            <p class="certification-message">Your Application is approved.</p>
+            {% elif existing_certification.is_approved == 'rejected' %}
+            <p class="certification-message">Your Application is rejected.</p>
+            {% else %}
+              <p> Not working </p>                
+            {% endif %}
+          {% else %}
+            <!-- Display the certification form -->
+            <form method="post" enctype="multipart/form-data" >
+              {% csrf_token %}
+              <div class="form-group mb-3" style="margin-top: 10px;">
+                <label for="certification_image">Store License Image:</label>
+                <input type="file" id="certification_image" name="certification_image" accept="image/*">
+                <span id="certification_image_error" class="text-danger"></span>
+              </div>
+              <div class="form-group mb-3" style="margin-top: 10px;">
+                <label for="owner_name">Owner Name:</label>
+                <input type="text" id="owner_name" name="owner_name" class="form-control" value="{{ user.userprofile.name }}" readonly>
+                <span id="owner_name_error" class="text-danger"></span>
+
+              </div>
+              <div class="form-group mb-3" style="margin-top: 10px;">
+                <label for="store_name">Store Name:</label>
+                <input type="text" id="store_name" name="store_name" class="form-control" value="{{ user.seller.storename }}" >
+                <span id="store_name_error" class="text-danger"></span>
+
+              </div>
+              <div class="form-group mb-3" style="margin-top: 10px;">
+                <label for="expiry_date_from">Expiry Date From:</label>
+                <input type="date" id="expiry_date_from" name="expiry_date_from" class="form-control">
+                <span id="expiry_date_from_error" class="text-danger"></span>
+
+              </div>
+              <div class="form-group mb-3" style="margin-top: 10px;">
+                <label for="expiry_date_to">Expiry Date To:</label>
+                <input type="date" id="expiry_date_to" name="expiry_date_to" class="form-control">
+                <span id="expiry_date_to_error" class="text-danger"></span>
+
+              </div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+          {% endif %}
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    
+    $(document).ready(function () {
+      $("#certification_image").change(function () {
+        validateCertificationImage("#certification_image");
+      });
+    
+      $("#owner_name").keyup(function () {
+        validateOwnerName("#owner_name");
+      });
+    
+      $("#store_name").keyup(function () {
+        validateStoreName("#store_name");
+      });
+    
+      $("#expiry_date_from").change(function () {
+        validateExpiryDateFrom("#expiry_date_from");
+      });
+    
+      $("#expiry_date_to").change(function () {
+        validateExpiryDateTo("#expiry_date_to");
+      });
+  });  
+      function validateCertificationImage(fieldId) {
+        var certificationImage = $(fieldId).val().trim();
+        var certificationImageError = $("#certification_image_error");
+        if (certificationImage === "") {
+        $("#certification_image_error").html("Store License Image is required").css("color", "red");
+          certificationImageError.text("Store License Image is required").css("color", "red");
+        } else {
+          $("#certification_image_error").html("").css("color", "red");
+      }
+      }
+    
+      function validateOwnerName(fieldId) {
+        var ownerName = $(fieldId).val().trim();
+        var lettersOnlyPattern = /^[A-Za-z\s]+$/;
+    
+        if (ownerName === "") {
+          $("#owner_name_error").html("Enter your Owner name").css("color", "red");
+        } else if (!lettersOnlyPattern.test(ownerName)) {
+          $("#owner_name_error").html("Owner Name should contain only letters and spaces").css("color", "red");
+       } else {
+          $("#owner_name_error").html("");
+      }
+      }
+    
+      function validateStoreName(fieldId) {
+        var storeName = $(fieldId).val().trim();
+    
+        if (storeName === "") {
+          $("#store_name_error").html("Store Name is required").css("color", "red");
+        } else {
+          $("#store_name_error").html("").css("color", "red");
+        }
+      }
+    
+      function validateExpiryDateFrom(fieldId) {
+        var expiryDateFrom = $(fieldId).val().trim();
+        var datePattern = /^\d{4}-\d{2}-\d{2}$/; // Updated date pattern
+        var today = new Date().toLocaleDateString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' }); // Format the date as "yyyy-mm-dd"
+    
+        if (expiryDateFrom === "") {
+          $("#expiry_date_from_error").html("Expiry Date From is required").css("color", "red");
+        } else if (!datePattern.test(expiryDateFrom) || expiryDateFrom > today) {
+          $("#expiry_date_from_error").html("Expiry Date from should not be after the current date").css("color", "red");
+        } else {
+          $("#expiry_date_from_error").html("").css("color", "red");
+        }
+      }
+    
+      function validateExpiryDateTo(fieldId) {
+        var expiryDateTo = $(fieldId).val().trim();
+        var datePattern = /^\d{4}-\d{2}-\d{2}$/; // Updated date pattern
+        var today = new Date().toLocaleDateString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' }); // Format the date as "yyyy-mm-dd"
+    
+        if (expiryDateTo === "") {
+          $("#expiry_date_to_error").html("Expiry Date To is required").css("color", "red");
+        } else if (!datePattern.test(expiryDateTo) || expiryDateTo <= today) {
+          $("#expiry_date_to_error").html("Expiry Date from should not be the current date or before the current date").css("color", "red");
+        } else {
+          $("#expiry_date_to_error").html("").css("color", "red");
+        }
+      }
+      // Add other validations if needed
+  
+    
+  
+  </script>
+    {% endblock %}
+
+</body>
+
+</html>

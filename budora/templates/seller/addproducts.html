@@ -1,0 +1,184 @@
+{% extends 'seller/base.html' %}
+{% load static %}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Seller Dashboard</title>
+  <link rel="shortcut icon" type="image/png" href="{% static 'images/logoecohive.png' %}" />
+  <link rel="stylesheet" href="{% static 'admin/assets/css/styles.min.css' %}" />
+</head>
+
+<body>
+  {% block content %}
+
+    <div class="body-wrapper" >
+      
+      <div class="container-fluid">
+        <div class="card"  style="border-style: none; box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px; ">
+          <div class="card-body">
+            {% if error_message %}
+            <div class="alert alert-danger">
+                {{ error_message }}
+            </div>
+            {% endif %}
+            <h5 class="card-title fw-semibold mb-4">Add Plants</h5> 
+            {% if certification_status == 'approved' %}
+            <form method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+              {% csrf_token %}
+              <div class="form-group mb-3" style="margin-top: 30px;">
+                  <label for="product_name">Plant Name:</label>
+                  <input type="text" id="product_name" name="product_name" class="form-control" oninput="validateProductName()">
+                  <span id="product_name_error" class="text-danger"></span>
+              </div>
+              <div class="form-group mb-3" style="margin-top: 10px;">
+                  <label for="product_description">Plant Description:</label>
+                  <textarea id="product_description" name="product_description" class="form-control" rows="4" oninput="validateProductDescription()"></textarea>
+                  <span id="product_description_error" class="text-danger"></span>
+              </div>
+              <div class="form-group mb-3" style="margin-top: 10px;">
+                  <label for="product_price">Plant Price:</label>
+                 
+                  <input type="text" id="product_price" name="product_price" class="form-control" oninput="validateProductPrice()">
+                  <span id="product_price_error" class="text-danger"></span>
+              </div>
+              <div class="form-group mb-3" style="margin-top: 10px;">
+                <label for="product_stock">Enter Stock(in KG):</label>     
+                <input type="text" id="product_stock" name="product_stock" class="form-control" oninput="validateProductstock()">
+                <span id="product_stock_error" class="text-danger"></span>
+            </div>
+              <div class="form-group mb-3" style="margin-top: 10px;">
+                  <label for="select_category">Select Category:</label>
+                  <select id="select_category" name="select_category" class="form-control" required>
+                      <option value="">Select Category</option>
+                      {% for category in categories %}
+                          <option value="{{ category.id }}">{{ category.category_name }}</option>
+                      {% endfor %}
+                  </select>
+                  <span id="select_category_error" class="text-danger"></span>
+              </div>
+              <div class="form-group mb-3" style="margin-top: 10px;">
+                  <label for="product_image">Category Image:</label>
+                  <input type="file" id="product_image" name="product_image" accept="image/*" oninput="validateProductImage()">
+                  <span id="product_image_error" class="text-danger"></span>
+              </div>
+              <input type="hidden" name="product_form" value="1">
+              <button type="submit" style="margin-top: 30px;" class="btn btn-primary pulse" id="add-product-button">Add Plants</button>
+          </form>    
+          {% elif certification_status == 'pending' %}
+          <p class="certification-message">You need an approved certification to add Plants.</p>
+          {% elif certification_status == 'rejected' %}
+              <p class="certification-message">Your certification application has been rejected.</p>
+          {% else %}
+          <a href="{% url 'addproducts' %}" class="btn btn-danger">Go Back</a></p>
+          {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function validateProductName() {
+      var productNameInput = document.getElementById("product_name");
+      var productName = productNameInput.value.trim();
+
+      // Regular expression to match a name with the first letter capitalized and the rest in lowercase
+      var namePattern = /^[A-Z][a-z]*$/;
+
+      if (!namePattern.test(productName)) {
+          document.getElementById("product_name_error").innerText = "only letters, with the first letter capitalized and the rest in lowercase";
+          productNameInput.classList.add("is-invalid");
+      } else {
+          document.getElementById("product_name_error").innerText = "";
+          productNameInput.classList.remove("is-invalid");
+      }
+  }
+
+    function validateProductDescription() {
+        var productDescription = document.getElementById("product_description").value;
+
+        if (productDescription.trim() === "") {
+            document.getElementById("product_description_error").innerText = "Product Description is required";
+        } else {
+            document.getElementById("product_description_error").innerText = "";
+        }
+    }
+
+    function validateProductPrice() {
+      var productPriceInput = document.getElementById("product_price");
+      var productPrice = productPriceInput.value.trim();
+
+      // Regular expression to match only numbers
+      var pricePattern = /^\d+$/;
+
+      if (!pricePattern.test(productPrice)) {
+          document.getElementById("product_price_error").innerText = "Please enter a valid Product Price";
+          productPriceInput.classList.add("is-invalid");
+      } else {
+          document.getElementById("product_price_error").innerText = "";
+          productPriceInput.classList.remove("is-invalid");
+      }
+  }
+
+  function validateProductstock() {
+    var productStockInput = document.getElementById("product_stock");
+    var productStock = productStockInput.value.trim();
+
+    // Regular expression to match only numbers
+    var stockPattern = /^\d+$/;
+
+    if (!stockPattern.test(productStock)) {
+        document.getElementById("product_stock_error").innerText = "Please enter a valid Product Stock";
+        productPriceInput.classList.add("is-invalid");
+    } else {
+        document.getElementById("product_stock_error").innerText = "";
+        productStockInput.classList.remove("is-invalid");
+    }
+}
+
+    function validateProductImage() {
+        var productImage = document.getElementById("product_image").value;
+
+        if (productImage.trim() === "") {
+            document.getElementById("product_image_error").innerText = "Product Image is required";
+        } else {
+            document.getElementById("product_image_error").innerText = "";
+        }
+    }
+
+    function validateForm() {
+        validateProductName();
+        validateProductDescription();
+        validateProductPrice();
+        validateProductstock();
+        validateProductImage();
+
+        var selectedCategory = document.getElementById("select_category").value;
+
+        // Validate Selected Category
+        if (selectedCategory === "") {
+            document.getElementById("select_category_error").innerText = "Please select a category";
+        } else {
+            document.getElementById("select_category_error").innerText = "";
+        }
+
+        // Check if any errors exist
+        if (
+            document.getElementById("product_name_error").innerText === "" &&
+            document.getElementById("product_description_error").innerText === "" &&
+            document.getElementById("product_price_error").innerText === "" &&
+            document.getElementById("product_stock_error").innerText === "" &&
+            document.getElementById("product_image_error").innerText === "" &&
+            document.getElementById("select_category_error").innerText === ""
+        ) {
+            return true; // No errors, allow form submission
+        } else {
+            return false; // Errors exist, prevent form submission
+        }
+    }
+</script>
+</body>
+{% endblock %}
+</html>

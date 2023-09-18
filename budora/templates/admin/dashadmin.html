@@ -1,0 +1,52 @@
+{% extends 'admin/base1.html' %}
+{% load static %}
+<html>
+<head>
+  <title>Admin Dashboard</title>
+</head>
+<style>
+</style>
+<body>
+  {% block content %}
+  <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+  
+  <div class="container-fluid" class="card-title mb-4" style="padding-bottom:5%; background:none;">
+      <h2 style="color: white; text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px;">Dashboard</h2>
+      <div class="card" style="border-style: none; border-radius:30px;background:none;">
+          <div class="card-body" style="background:none;">
+  
+              <div class="dashboard-section">
+                  <h3 class="section-title">Users</h3>
+                  <p class="section-description">Manage user approvals and registered users.</p>
+                  <div class="dashboard-subsection">
+                      <a href="{% url 'dashlegal' %}" class="dashboard-link">Seller Approval</a>
+                      <a href="{% url 'user_list' %}" class="dashboard-link">Registered Users</a>
+                  </div>
+              </div>
+  
+              <div class="dashboard-section">
+                  <h3 class="section-title">Products</h3>
+                  <p class="section-description">Manage stock and view product listings.</p>
+                  <div class="dashboard-subsection">
+                      <a href="{% url 'viewstock' %}" class="dashboard-link">Stock</a>
+                      <a href="{% url 'viewproducts' %}" class="dashboard-link">View Products</a>
+                  </div>
+              </div>
+  
+              <div class="dashboard-section">
+                  <h3 class="section-title">Category</h3>
+                  <p class="section-description">Manage product categories and view existing categories.</p>
+                  <div class="dashboard-subsection">
+                      <a href="{% url 'addcategory' %}" class="dashboard-link">Add Category</a>
+                      <a href="{% url 'viewcategory' %}" class="dashboard-link">View Categories</a>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+    {% endblock %}
+
+</body>
+
+</html>

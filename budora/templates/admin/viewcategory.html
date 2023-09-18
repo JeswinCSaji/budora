@@ -1,0 +1,58 @@
+{% extends 'admin/base1.html' %}
+{% load static %}
+
+<html >
+<head>
+  <title>Admin Dashboard</title>
+</head>
+<style>
+    .btn-action {
+        width: 80px; /* Adjust the width as needed */
+        line-height: 10px; /* Adjust the line height as needed */
+        margin-right: 5px; /* Add some spacing between buttons */
+    }
+</style>
+<body>
+  {% block content %}
+  <link rel="stylesheet" href="{% static 'css/viewproducts.css' %}">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+      <div class="container-fluid" class="card-title mb-4" style="padding-bottom:5%;">
+        <h5 id="regtitle">Added Categories</h5>
+      
+            <div class="container mt-4" style="border-style: none; box-shadow: black 0px 20px 30px -10px;">
+                <table class="user-list" style="background-color:white;" >
+                    <thead>
+                        <tr>
+                            <th style="font-weight: bold;">Category Name</th>
+                            <th style="font-weight: bold;">Category Description</th>
+                            <th style="font-weight: bold;" colspan="2">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for category in categories %}
+                            <tr>
+                                <td style="font-weight: bold;">{{ category.category_name }}</td>
+                                <td style="font-weight: bold;">{{ category.category_description }}</td>
+                                <td>
+                                    <a href="{% url 'edit_category' category.id %}" class="btn btn-primary btn-sm btn-action">Update</a>
+                                </td>
+                                <td>
+                                    <a href="{% url 'delete_category' category.id %}" class="btn btn-danger btn-sm btn-action">Delete</a>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="3">No categories added yet.</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+          </div>
+     
+    </div>
+  </div>
+  {% endblock %}
+</body>
+</html>

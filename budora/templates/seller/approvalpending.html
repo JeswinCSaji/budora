@@ -29,8 +29,8 @@
             {% endif %}            
             {% csrf_token %}
 
-            <div class="error-message" style=" border-style:groove; border-color:red; border-width: 2px; box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px; margin-left:5%; width:210px; margin-top:20px; ">
-                <p style="color: #c70ca1; margin-top:5px; font-size:x-large;">Seller request submitted. Please wait for approval.
+            <div class="error-message" style=" border-style:groove; border-color:white; border-width: 2px; box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px; margin-left:5%; width:210px; margin-top:10%; ">
+                <p style="color: red; margin-top:5px; font-size:x-large; margin-left: 8%;">Seller request submitted. Please wait for approval.
                             {% for message in messages %}
                                 {{ message }}
                              {% endfor %}
@@ -39,7 +39,7 @@
            
             
 
-            <p id="signinelement3" style="color: #c70ca1; margin-left: 24px; margin-top:31px; margin-bottom:18px; font-size: medium;">Don't have an account? <a href="{% url 'seller_register' %}" style="color: white; text-decoration: none">Signup</a></p>
+            <p id="signinelement3" style="color: #c70ca1; margin-left: 24px; margin-top:20%; margin-bottom:18px; font-size: medium;">Don't have an account? <a href="{% url 'seller_register' %}" style="color: white; text-decoration: none">Signup</a></p>
             <a style="color: #c70ca1; text-decoration: none; font-size: large;text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px; margin-left: 25px;" href="{% url 'loginu' %}">
                 Login as Customer<i style="color:green; margin-left: 10px;" class="fa fa-arrow-right" ></i></a>
         </form>

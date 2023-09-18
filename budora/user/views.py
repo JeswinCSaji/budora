@@ -4,15 +4,16 @@ from django.shortcuts import render, redirect, HttpResponse
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login as auth_login, logout, get_user_model
 from django.contrib import messages
-
+from django.http import JsonResponse
 from .models import Seller
-from .forms import CertificationForm
-from .models import Certification,Application, ApplicationStatus
+from .models import Certification
 from django.shortcuts import get_object_or_404
-from .models import Application, ApplicationStatus
-
+from django.db import IntegrityError  
 from django.contrib.auth.decorators import login_required 
 from .models import Category,Product
+from .models import ProductSummary  
+from django.core.exceptions import ValidationError
+from django.contrib.auth import password_validation
 
 def register(request):
      
@@ -23,6 +24,13 @@ def register(request):
         password = request.POST.get('pwd')
         Cpassword = request.POST.get('cpwd')
 
+        try:
+            password_validation.validate_password(password, User)
+        except ValidationError as e:
+            for error in e.error_list:
+                messages.error(request, error)
+            return redirect('register')
+        
         if password == Cpassword:
             if User.objects.filter(username=username).exists():
                 messages.info(request, "Username already taken")
@@ -51,25 +59,33 @@ def loginu(request):
         user = authenticate(request, username=username, password=password)
         if user is not None:
             auth_login(request, user)
-            request.session['user_id'] = user.id
-            request.session['username'] = user.email
-            if user.is_staff:
+            
+            if user.is_superuser:
+                request.session['user_id'] = user.id
+                request.session['username'] = user.email
+                return redirect('admin_index') 
+            elif user.is_staff:
+                request.session['user_id'] = user.id
+                request.session['username'] = user.email
                 return redirect('seller_index')
-            elif user.is_superuser:
-                return redirect('admin_index')
             else:
+                request.session['user_id'] = user.id
+                request.session['username'] = user.email
                 return redirect('index.html')  # Redirect other users to index.html
         else :   
-            messages.error(request, "Invalid credentials")
+            messages.error(request, "Invalid email or password. Please try again.")
             return redirect('loginu')
             
     else:
         return render(request, 'login.html') 
-
-
+    
+def admin_index(request):
+    return render(request, 'admin/dashadmin.html')
 
 def index(request):
-    return render(request, 'index.html')
+    product_summaries = ProductSummary.objects.all()
+    print(product_summaries)  # Fetch all ProductSummary instances
+    return render(request, 'index.html', {'product_summaries': product_summaries})
 
 def loggout(request):
     print('Logged Out')
@@ -79,19 +95,20 @@ def loggout(request):
         request.session.clear()
     return redirect('index')
 
-def edit_profile(request):
+@login_required
+def profile(request):
     user_profile = UserProfile.objects.get(user=request.user)
 
     if request.method == 'POST':
         name = request.POST.get('name')
         email = request.POST.get('email')
-        profile_pic = request.FILES.get('profile_picture')
+        profile_pic = request.FILES.get('profile_pic')
         phone_number = request.POST.get('phone_number')
         address = request.POST.get('address')
         if 'profile_pic' in request.FILES:
-            profile_pic = request.FILES['profile_picture']
+            profile_pic = request.FILES['profile_pic']
             user_profile.profile_pic = profile_pic
-
+            print('got')
         user_profile.name = name
         user_profile.phone_number = phone_number
         user_profile.address = address
@@ -99,32 +116,41 @@ def edit_profile(request):
 
         user_profile.save()
         request.user.save()
-        # messages.success(request, "Profile updated successfully")
+        messages.success(request, "Profile updated successfully")
         return redirect('profile') 
 
 
     context = {
         'user_profile': user_profile
     }
-    return render(request, 'userprofile/edit-profile.html', context)
+    return render(request, 'userprofile/user_profile.html', context)
 
-def profile(request):
-    return render(request, 'userprofile/user_profile.html')
-
+@login_required
 def user_dashboard(request):
     return render(request,'userprofile/user_dashboard.html')
 
 def plant_recommendation(request):
     return render(request,'recommendation/plantrecommendation.html')
 
+def saveproduct(request):
+    return render(request,'usertems/save.html')
 
 def seller_register(request):
     if request.method == 'POST':
-        
+        name = request.POST.get('username')
         username = request.POST['email']
         email = request.POST['email']
         password = request.POST['pwd']
         Cpassword = request.POST.get('cpwd')
+        
+        # Validate password strength
+        try:
+            password_validation.validate_password(password, User)
+        except ValidationError as e:
+            for error in e.error_list:
+                messages.error(request, error)
+            return redirect('seller_register')
+        
         if password == Cpassword:
             if User.objects.filter(username=username).exists():
                 messages.info(request, "Username already taken")
@@ -137,15 +163,21 @@ def seller_register(request):
                 contact = request.POST['contact']
                 address = request.POST['address']
                 storename = request.POST['storename']
-                seller = Seller.objects.create(user=user, storename=storename, contact=contact, address=address)
+                seller = Seller.objects.create(user=user,email=email ,name=name, storename=storename, contact=contact, address=address)
+                seller.save()
+               
+                # Set the user as staff
+                user.is_staff = True
                 user.save()
-                messages.success(request,"Seller request submitted. Please wait for approval.")
-                UserProfile.objects.create(user=user, address="")
-                return redirect('approvalpending')
+                
+                # messages.success(request,"Seller request submitted. Please wait for approval.")
+                UserProfile.objects.create(user=user, name=name)
+                return redirect('loginu')
         else:
             messages.info(request, "Passwords do not match")
             return redirect('seller_register')
     return render(request, 'seller/seller_register.html')
+
 
 def seller_login(request):
     if request.method == 'POST':
@@ -165,6 +197,7 @@ def seller_login(request):
 #     return render(request,'seller/base.html')
 
 
+@login_required
 def approvalpending(request):
     return render(request,'seller/approvalpending.html')
 
@@ -174,82 +207,399 @@ def seller_loggout(request):
     if 'username' in request.session:
         del request.session['username']
         request.session.clear()
-    return redirect('loginu')
+    return redirect(loginu)
+
+def admin_loggout(request):
+    print('Logged Out')
+    logout(request)
+    if 'username' in request.session:
+        del request.session['username']
+        request.session.clear()
+    return redirect(loginu)
 
 @login_required
 def seller_index(request):
-    # Get the user's applications
-    user_applications = Application.objects.filter(user=request.user)
-
-    # Check the approval status for each application
-    approval_statuses = ApplicationStatus.objects.filter(application__in=user_applications)
-    existing_certification = Certification.objects.filter(user=request.user)
-
-    categories = Category.objects.all()
-    products = Product.objects.all()
+    existing_certification = Certification.objects.filter(user=request.user).first()
 
     if existing_certification:
-        return render(request, 'seller/base.html', {'existing_certification': existing_certification})
-
-    form = CertificationForm()
+        return render(request, 'seller/dashseller.html', {'existing_certification': existing_certification})
 
     if request.method == 'POST':
-        form = CertificationForm(request.POST, request.FILES)
-        if form.is_valid():
-            print("Form is valid")  # Debug statement
-            certification = form.save(commit=False)
-            certification.user = request.user
-            certification.save()
-            print("Certification saved successfully")  # Debug statement
-            return redirect('successseller')  # Redirect to a success page
-        else:
-            messages.error(request, 'Please fill in all required fields.')
-            print("Form is not valid")  # Debug statement
+        # Handle form submission
+        certification_image = request.FILES.get('certification_image')
+        owner_name = request.POST.get('owner_name')
+        store_name = request.POST.get('store_name')
+        expiry_date_from = request.POST.get('expiry_date_from')
+        expiry_date_to = request.POST.get('expiry_date_to')
 
-        if 'product_form' in request.POST:
-                # Product form submission
-            print("Product form submitted")  # Debug statement
+        # Perform client-side validation here using JavaScript if needed
+
+        # Perform server-side validation if needed
+        if not certification_image or not owner_name or not store_name or not expiry_date_from or not expiry_date_to:
+            messages.error(request, 'Please fill in all required fields.')
+        else:
+            # Create and save the Certification instance
+            certification = Certification(
+                user=request.user,
+                certification_image=certification_image,
+                owner_name=owner_name,
+                store_name=store_name,
+                expiry_date_from=expiry_date_from,
+                expiry_date_to=expiry_date_to,
+            )
+            certification.save()
+            return redirect('successseller')  # Redirect to a success page
+
+    return render(request, 'seller/dashseller.html', {
+        'existing_certification': existing_certification,
+    })
+
+@login_required
+def successseller(request):
+    return render(request, 'seller/successseller.html')
+
+@login_required
+def successaddcategory(request):
+    return render(request, 'admin/successaddcategory.html')
+
+@login_required
+def successaddproduct(request):
+    return render(request, 'seller/successaddproduct.html')
+
+@login_required
+def viewcategory(request):
+    categories = Category.objects.all()
+    return render(request, 'admin/viewcategory.html', {'categories': categories})
+
+@login_required
+def viewaddproduct(request):
+    existing_certification = Certification.objects.filter(user=request.user).first()
+
+    if not existing_certification:
+        messages.error(request, 'You need an approved certification to add products.')
+        return redirect('seller_index')
+
+    try:
+        seller = request.user.seller  # Assuming the Seller profile is associated with the User model
+        user_products = Product.objects.filter(seller=seller)
+    except Seller.DoesNotExist:
+        user_products = []
+
+    return render(request, 'seller/viewaddproduct.html', {'user_products': user_products})
+
+@login_required
+def viewproducts(request):
+    # Retrieve all products
+    all_products = Product.objects.all()
+
+    context = {
+        'all_products': all_products,
+    }
+    return render(request, 'admin/viewproducts.html', context)
+
+
+
+@login_required
+def addproducts(request):
+    
+    existing_certification = Certification.objects.filter(user=request.user).first()
+
+    if existing_certification:
+        certification_status = existing_certification.is_approved
+    else:
+        certification_status = 'pending'  # Set a default value if no certification exists
+
+    if certification_status == 'approved':
+        if request.method == 'POST':
+        # Extract data from the POST request
             product_name = request.POST.get('product_name')
             product_description = request.POST.get('product_description')
             select_category_id = request.POST.get('select_category')
+            product_price = request.POST.get('product_price')
+            product_stock = request.POST.get('product_stock')
             product_image = request.FILES.get('product_image')
 
-                # Ensure all required fields are provided
-            if product_name and product_description and select_category_id:
-                try:
-                        # Retrieve the selected category
-                    selected_category = Category.objects.get(id=select_category_id)
+        # Retrieve the selected category
+            category = Category.objects.get(id=select_category_id)
 
-                        # Calculate the product price based on the selected category
-                    product_price = selected_category.default_product_price
+        # Check if a product with the same name already exists in the selected category
+        # Check if the current user has already added a product with the same name in this category
+            existing_product = Product.objects.filter(
+                product_name=product_name,
+                category=category,
+                seller__user=request.user  # Filter by the current user
+            )
 
-                        # Create a new product instance with the calculated price
-                    product = Product(
-                        product_name=product_name,
-                        product_description=product_description,
-                        category=selected_category,
-                        product_price=product_price,
-                        product_image=product_image,
-                    )
-                    product.save()
-                    messages.success(request, 'Product added successfully.')
-                    return redirect('successaddproduct')
-                except Category.DoesNotExist:
-                    messages.error(request, 'Selected category does not exist.')
-            else:
-                messages.error(request, 'Please fill in all required fields.')
-    print(categories)
-    return render(request, 'seller/base.html', {
-    'form': form,
-    'approval_statuses': approval_statuses,
-    'existing_certification': existing_certification,
-    'categories': categories,
-    'products': products,
-})
+            if existing_product.exists():
+                error_message = "You have already added a product with this name in the selected category."
+                return render(request, 'seller/addproducts.html', {'error_message': error_message})
 
-def successseller(request):
-    return render(request, 'seller/successseller.html')
-def successaddcategory(request):
-    return render(request, 'seller/successaddcategory.html')
-def successaddproduct(request):
-    return render(request, 'seller/successaddproduct.html')
+        # Retrieve the seller associated with the currently logged-in user
+            seller = Seller.objects.get(user=request.user)
+        # Create and save the Product instance
+            product = Product(
+                product_name=product_name,
+                product_description=product_description,
+                category=category,
+                product_price=product_price,
+                product_stock=product_stock,
+                product_image=product_image,
+                seller=seller  # Associate the seller with the product
+
+            )
+            product.save()
+
+            return redirect('successaddproduct')  # Redirect to a success page after saving the product
+
+        categories = Category.objects.all()  # Retrieve all Category objects from the database
+
+        context = {
+            'categories': categories,
+            'certification_status': certification_status,
+          # Pass the categories queryset to the template context
+            }
+        
+        return render(request, 'seller/addproducts.html', context)
+    else:
+        return render(request, 'seller/addproducts.html', {'certification_status': certification_status})
+
+@login_required
+def delete_product(request, product_id):
+    try:
+        product = Product.objects.get(id=product_id)
+        product.delete()
+    except Product.DoesNotExist:
+        # Handle the case where the product with the given ID does not exist.
+        pass
+
+    # Redirect back to the viewproducts page or wherever you want to go after deletion.
+    return redirect('viewproducts')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# def update_product(request, product_id):
+#     product = Product.objects.get(id=product_id)
+
+#     if request.method == 'POST':
+#         product.category_name = request.POST['category_name']
+#         product.category_description = request.POST['category_description']
+#         product.save()
+#         return redirect('viewcategory') 
+
+#     return render(request, 'admin/edit_category.html', {'product': product})
+@login_required
+def dashlegal(request):
+    # Retrieve Certification objects including their IDs
+    seller_applications = Certification.objects.all()
+
+    # Retrieve User roles for each Certification applicant
+    user_roles = {}
+    for application in seller_applications:
+        # Ensure the user associated with the Certification exists
+        user = get_object_or_404(User, id=application.user_id)
+
+        # Retrieve user roles
+        user_roles[application.id] = {
+            'is_admin': user.is_superuser,
+            'is_customer': user,
+            'is_seller': user.is_staff
+        }
+
+    context = {
+        'seller_applications': seller_applications,
+        'user_roles': user_roles,  # Include user roles in the context
+    }
+    return render(request, 'admin/dashlegal.html', context)
+
+@login_required
+def addcategory(request):
+    if request.method == 'POST':
+        try:
+            # Retrieve form data directly from the request
+            category_name = request.POST.get('category_name')
+            category_description = request.POST.get('category_description')
+           
+
+            # Create a new Category instance with the form data
+            category = Category(
+                category_name=category_name,
+                category_description=category_description,
+                
+            )
+            category.save()
+
+            # Display a success message
+            messages.success(request, 'Category created successfully.')
+            return redirect('successaddcategory')  # Redirect back to the admin page
+
+        except IntegrityError as e:
+            # Handle database integrity error (e.g., unique constraint violation)
+            messages.error(request, 'Error creating category: {}'.format(str(e)))
+
+    return render(request, 'admin/addcategory.html')
+
+@login_required
+def delete_category(request, category_id):
+    # Get the category object to delete
+    category = get_object_or_404(Category, pk=category_id)
+
+    associated_products = Product.objects.filter(category=category)
+
+    if request.method == 'POST':
+        # Delete all associated products
+        associated_products.delete()
+        
+        # Delete the category
+        category.delete()
+        
+        return redirect('viewcategory')  # Redirect to the category list page
+
+    return render(request, 'admin/delete_category.html', {'category': category, 'associated_products': associated_products})
+
+@login_required
+def edit_category(request, category_id):
+    category = Category.objects.get(id=category_id)
+
+    if request.method == 'POST':
+        category.category_name = request.POST['category_name']
+        category.category_description = request.POST['category_description']
+        category.save()
+        return redirect('viewcategory')  # Replace 'category_list' with your category list URL name
+
+    return render(request, 'admin/edit_category.html', {'category': category})
+
+@login_required
+def approve_certification(request, certification_id):
+    certification = get_object_or_404(Certification, id=certification_id)
+    if request.method == 'POST':
+        certification.is_approved = Certification.APPROVED  # Set it to 'approved'
+        certification.save()
+    return redirect('dashlegal')
+
+@login_required
+def reject_certification(request, certification_id):
+    certification = get_object_or_404(Certification, id=certification_id)
+    if request.method == 'POST':
+        certification.is_approved = Certification.REJECTED  # Set it to 'rejected'
+        certification.save()
+    return redirect('dashlegal')
+
+@login_required
+def user_list(request):
+    users = User.objects.all()
+    return render(request, 'admin/userlist.html', {'users': users})
+
+@login_required
+def edit_user(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+
+    if request.method == 'POST':
+        # Handle form submission and update user details
+        user.username = request.POST['username']
+        user.email = request.POST['email']
+
+        # Update user role based on the selected role option
+        role = request.POST.get('role')
+        if role == 'customer':
+            user.is_staff = False
+            user.is_superuser = False
+        elif role == 'staff':
+            user.is_staff = True
+            user.is_superuser = False
+        elif role == 'superuser':
+            user.is_staff = True
+            user.is_superuser = True
+
+        user.save()
+        return redirect('user_list')  # Redirect back to the user list page
+
+    return render(request, 'admin/edituser.html', {'user': user})
+
+def view_products(request):
+    product_summaries = ProductSummary.objects.all()
+    return render(request, 'admin/viewstock.html', {'product_summaries': product_summaries})
+
+def edit_product_stock(request, pk):
+    product_summary = get_object_or_404(ProductSummary, pk=pk)
+
+    if request.method == 'POST':
+        # Update the product details based on the form submission
+        product_summary.product_description = request.POST['product_description']
+        product_summary.product_price = request.POST['product_price']
+        product_summary.product_image = request.FILES.get('product_image')  # Use get to handle optional file upload
+        product_summary.light_requirements = request.POST['light_requirements']
+        product_summary.water_requirements = request.POST['water_requirements']
+        product_summary.humidity_requirements = request.POST['humidity_requirements']
+        product_summary.soil_type = request.POST['soil_type']
+        product_summary.toxicity_information = request.POST['toxicity_information']
+        product_summary.maintenance_instructions = request.POST['maintenance_instructions']
+        product_summary.save()
+        return redirect('viewstock')  # Redirect to the product summary page after editing
+
+    return render(request, 'admin/editstock.html', {'product_summary': product_summary})
+
+def edit_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    categories = Category.objects.all()  # Assuming you have a 'Category' model
+
+    if request.method == 'POST':
+        # Update the product fields based on form input
+        product.product_name = request.POST['product_name']
+        product.product_description = request.POST['product_description']
+        
+        # Get the category instance based on the selected ID
+        category_id = request.POST.get('select_category')
+        if category_id:
+            category = get_object_or_404(Category, id=category_id)
+            product.category = category
+        
+        product.product_price = request.POST['product_price']
+        product.product_stock = request.POST['product_stock']
+        
+        # Handle product image upload or update
+        if 'product_image' in request.FILES:
+            product.product_image = request.FILES['product_image']
+
+        # Save the updated product
+        product.save()
+        return redirect('viewaddproduct')  # Redirect to the product list page
+
+    return render(request, 'seller/edit_product.html', {'product': product, 'categories': categories})
+
+@login_required
+def delete_add_product(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    if request.method == 'POST':
+        # Handle form submission for deleting the product
+        product.delete()
+        return redirect('viewaddproduct')  # Redirect to the product list page
+
+    return render(request, 'seller/delete_add_product.html', {'product': product})

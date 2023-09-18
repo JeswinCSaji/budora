@@ -2,6 +2,8 @@ from django.contrib import admin
 from .models import Seller
 from .models import Certification
 from .models import Category, Product, UserProfile
+from .models import ProductSummary
+
 # Register your models here.
 admin.site.register(Seller)
 
@@ -13,15 +15,18 @@ class CertificationAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('category_name', 'default_product_price')  # Customize the fields to display
-    list_filter = ('default_product_price',)  # Add filters if needed
+    list_display = ('category_name', 'category_description')  # Replace with actual field names
+    list_filter = ('category_name', 'category_description')  # Add filters if needed
     search_fields = ('category_name', 'category_description')  # Add search fields if needed
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('product_name', 'category', 'product_price','product_image')  # Customize the fields to display
+    list_display = ('product_name', 'category', 'product_price','product_image','seller','product_stock')  # Customize the fields to display
     list_filter = ('category', 'product_price')  # Add filters if needed
     search_fields = ('product_name', 'product_description')  # Add search fields if needed
 
+@admin.register(ProductSummary)
+class ProductSummaryAdmin(admin.ModelAdmin):
+    list_display = ('product_name', 'total_stock')
 # Register your models here.
 admin.site.register(UserProfile)
