@@ -81,7 +81,7 @@
   
         rows.forEach(function (row) {
           const username = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
-          const role = row.querySelector('td:nth-child(4)').textContent.toLowerCase();
+          const role = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
   
           // Check if the user matches the selected role (or if all roles are selected)
           if ((selectedRole === 'all' || role.includes(selectedRole)) &&

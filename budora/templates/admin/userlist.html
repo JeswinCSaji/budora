@@ -32,7 +32,10 @@
             <th>Username</th>
             <th>Email</th>
             <th>Role</th>
-            <th>Edit details</th>
+            <th>Status</th>
+            <th>Change Status</th>
+            {% comment %} <th>Delete</th> {% endcomment %}
+            {% comment %} <th>Edit details</th> {% endcomment %}
           </tr>
         </thead>
         <tbody>
@@ -48,7 +51,33 @@
                     Customer
                   {% endif %}
                 </td>
-                <td> <a href="{% url 'edit_user' user.id %}" class="btn btn-edit">Edit</a></td>
+                <td>
+                  {% if user.is_active == True %}
+                  <span class="text-success" style="font-weight: bolder;font-size: large;" >Active</span>
+                  {% else %}
+                  <span class="text-danger" style="font-weight: bolder;font-size: large;" >Inactive</span>
+                  {% endif %}
+                </td>
+                <td style="padding-left:6%;">
+                  <div class="approval-status">                   
+                    {% if user.is_active == True %}
+                    <form method="post" action="{% url 'deactivate_user' user.id %}">
+                      {% csrf_token %}
+                      <button class="btn btn-danger reject-btn" type="submit" >Deactivate</button>
+                  </form>
+                  {% else %}
+                  <form method="post" action="{% url 'activate_user' user.id %}">
+                      {% csrf_token %}
+                      <button class="btn btn-success approve-btn" type="submit">Activate</button>
+                  </form>                       
+                    {% endif %}                 
+                </td>
+                {% comment %} <td>
+                    <a href="{% url 'delete_user' user.id %}" class="btn btn-edit">Delete</a>               
+                </td> {% endcomment %}
+                
+                
+                {% comment %} <td> <a href="{% url 'edit_user' user.id %}" class="btn btn-edit">Edit</a></td> {% endcomment %}
               </tr>
             {% endif %}
           {% endfor %}

@@ -10,8 +10,13 @@
     <div class="card" style="border-style: none; box-shadow: black 0px 20px 30px -10px;">
         <div class="card-body">
             
-            <form method="post" enctype="multipart/form-data" class="validation-form">
+            <form method="post" enctype="multipart/form-data" >
                 {% csrf_token %}
+                <div class="form-group">
+                    <label for="product_sci_name">Scientific Name</label>
+                    <textarea class="form-control" id="product_sci_name" name="product_sci_name" required>{{ product_summary.product_sci_name }}</textarea>
+                    <p id="product_sci_name_error" style="color: red;"></p>
+                </div>
                 <div class="form-group">
                     <label for="product_description">Plant Description</label>
                     <textarea class="form-control" id="product_description" name="product_description" required>{{ product_summary.product_description }}</textarea>
@@ -26,7 +31,7 @@
                 <!-- Input field for image upload if needed -->
                 <div class="form-group">
                     <label for="product_image">Plant Image</label>
-                    <input type="file" class="form-control" id="product_image" name="product_image" required>
+                    <input type="file" class="form-control" id="product_image" name="product_image">
                     <p id="plant_image_error" style="color: red;"></p>
                 </div>
                 <div class="form-group">
@@ -77,7 +82,9 @@
         $("input[name='product_price']").keyup(function () {
             validateProductPrice("input[name='product_price']");
         });
-
+        $("input[name='product_sci_name']").keyup(function () {
+            validateProductsciname("input[name='product_sci_name']");
+        });
         // Validation for light requirements
         $("input[name='light_requirements']").keyup(function () {
             validateLightRequirements("input[name='light_requirements']");
@@ -117,56 +124,8 @@
         });
 
         // Add an event listener for the form submission
-        $(".validation-form").submit(function (e) {
-            e.preventDefault(); // Prevent the form from submitting initially
-
-            // Validate all fields
-            var isFormValid = true;
-
-            if (!validatePlantImage("input[name='product_image']")) {
-                isFormValid = false;
-            }
-           
-            if (!validatePlantDescription("textarea[name='product_description']")) {
-                isFormValid = false;
-            }
-
-            if (!validateProductPrice("input[name='product_price']")) {
-                isFormValid = false;
-            }
-           
-            if (!validateLightRequirements("input[name='light_requirements']")) {
-                isFormValid = false;
-            }
-
-            if (!validateWaterRequirements("input[name='water_requirements']")) {
-                isFormValid = false;
-            }
-
-            if (!validateHumidityRequirements("input[name='humidity_requirements']")) {
-                isFormValid = false;
-            }
-
-            if (!validateSoilType("input[name='soil_type']")) {
-                isFormValid = false;
-            }
-
-            if (!validateToxicityInformation("input[name='toxicity_information']")) {
-                isFormValid = false;
-            }
-
-            if (!validateMaintenanceInstructions("textarea[name='maintenance_instructions']")) {
-                isFormValid = false;
-            }
-            
-
-            // If the form is valid, submit it
-            if (isFormValid) {
-                this.submit(); // Submit the form
-            }
-        });
+       
     });
-
 
     function validateLightRequirements(fieldSelector) {
     var lightRequirements = $(fieldSelector).val().trim();
@@ -178,6 +137,20 @@
         $("#light_requirements_error").html("").css("color", "red");
     }
 }
+
+function validateProductsciname(fieldSelector) {
+    var SciName = $(fieldSelector).val().trim();
+    var lettersOnlyPattern = /^[A-Za-z\s]+$/;
+
+    if (SciName === "") {
+      $("#product_sci_name_error").html("Enter Scientific name").css("color", "red");
+    } else if (!lettersOnlyPattern.test(SciName)) {
+      $("#product_sci_name_error").html("Scientific Name should contain only letters").css("color", "red");
+   } else {
+      $("#product_sci_name_error").html("");
+  }
+  }
+
 function validateProductPrice(fieldSelector) {
     var plantPrice = $(fieldSelector).val().trim();
     var plantPriceError = $("#product_price_error");

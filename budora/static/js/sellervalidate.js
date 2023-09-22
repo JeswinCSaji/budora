@@ -92,11 +92,11 @@ function validateConfirmPassword(fieldId) {
 
 function validateContact(fieldId) {
     var con = $(fieldId).val();
-    var filtercon = /^(\d{3})[- ]?(\d{3})[- ]?(\d{4})$/;
+    var filtercon = /^(\+91-|0)?[6-9]\d{9}$/;
     if (con === "") {
         $("#cnspan").html("Enter your Mobile Number").css("color", "red");
     } else if (!filtercon.test(con)) {
-        $("#cnspan").html("Incorrect Mobile Number").css("color", "red");
+        $("#cnspan").html("Phone Number should be atleast 10 numbers and cannot contain alphabets").css("color", "red");
     } else {
         $("#cnspan").html("");
     }

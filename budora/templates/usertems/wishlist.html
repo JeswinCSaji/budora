@@ -1,0 +1,52 @@
+{% extends 'usertems/base.html' %}
+{% load static %}
+<html>
+<head>
+  <title>Save Products</title>
+</head>
+<body>
+  {% block content %}
+  <link rel="stylesheet" type="text/css" href="//netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css">
+  <section class="ftco-section ftco-cart">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12 ftco-animate">
+                <div class="cart-list">
+                    <table class="table">
+                        <thead class="thead-primary">
+                            <tr class="text-center">
+                                <th>Product</th>
+                                <th>Product name</th>
+                                <th>Remove from Wishlist</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for wishlist_item in wishlist_items %}
+                            <tr class="text-center">
+                                <td class="product-thumbnail">
+                                    <img src="{{ wishlist_item.product.product_image.url }}" alt="{{ wishlist_item.product.product_name }}" class="img-fluid" style="height:100px;">
+                                </td>
+                                <td class="product-name">
+                                    <h3>{{ wishlist_item.product.product_name }}</h3>
+                                </td>
+                                <td class="remove-from-wishlist">
+                                    <form action="{% url 'remove_from_wishlist' wishlist_item.id %}" method="post">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn ">Remove From Wishlist</button>
+                                    </form>
+                                </td>
+                            </tr><!-- END TR-->
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+  
+  {% endblock %}
+
+</body>
+</html>

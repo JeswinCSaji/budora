@@ -30,3 +30,12 @@ class ProductSummaryAdmin(admin.ModelAdmin):
     list_display = ('product_name', 'total_stock')
 # Register your models here.
 admin.site.register(UserProfile)
+
+from .models import Wishlist
+
+class WishlistAdmin(admin.ModelAdmin):
+    list_display = ('user', 'product', 'quantity', 'date_added')
+    list_filter = ('user', 'date_added')
+    search_fields = ('user__username', 'product__product_name')
+
+admin.site.register(Wishlist, WishlistAdmin)

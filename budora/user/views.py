@@ -10,7 +10,7 @@ from .models import Certification
 from django.shortcuts import get_object_or_404
 from django.db import IntegrityError  
 from django.contrib.auth.decorators import login_required 
-from .models import Category,Product
+from .models import Category,Product,Wishlist
 from .models import ProductSummary  
 from django.core.exceptions import ValidationError
 from django.contrib.auth import password_validation
@@ -78,14 +78,30 @@ def loginu(request):
             
     else:
         return render(request, 'login.html') 
-    
+
+@login_required   
 def admin_index(request):
     return render(request, 'admin/dashadmin.html')
 
+
+ 
+def product(request):
+    return render(request, 'usertems/product.html')
+
 def index(request):
     product_summaries = ProductSummary.objects.all()
-    print(product_summaries)  # Fetch all ProductSummary instances
-    return render(request, 'index.html', {'product_summaries': product_summaries})
+    list1=[]
+    for summary in product_summaries:
+        if request.user.is_authenticated:
+            in_wishlist = is_in_wishlist(request,summary)
+        else:
+            in_wishlist=False
+        book_data = {
+            'product_summaries': summary,
+            'in_wishlist': in_wishlist,
+        }
+        list1.append(book_data)  
+    return render(request, 'index.html',{'product_summaries':list1})
 
 def loggout(request):
     print('Logged Out')
@@ -201,6 +217,7 @@ def seller_login(request):
 def approvalpending(request):
     return render(request,'seller/approvalpending.html')
 
+
 def seller_loggout(request):
     print('Logged Out')
     logout(request)
@@ -208,6 +225,7 @@ def seller_loggout(request):
         del request.session['username']
         request.session.clear()
     return redirect(loginu)
+
 
 def admin_loggout(request):
     print('Logged Out')
@@ -235,20 +253,20 @@ def seller_index(request):
         # Perform client-side validation here using JavaScript if needed
 
         # Perform server-side validation if needed
-        if not certification_image or not owner_name or not store_name or not expiry_date_from or not expiry_date_to:
-            messages.error(request, 'Please fill in all required fields.')
-        else:
+        # if not certification_image or not owner_name or not store_name or not expiry_date_from or not expiry_date_to:
+        #     messages.error(request, 'Please fill in all required fields.')
+        # else:
             # Create and save the Certification instance
-            certification = Certification(
-                user=request.user,
-                certification_image=certification_image,
-                owner_name=owner_name,
-                store_name=store_name,
-                expiry_date_from=expiry_date_from,
-                expiry_date_to=expiry_date_to,
-            )
-            certification.save()
-            return redirect('successseller')  # Redirect to a success page
+        certification = Certification(
+            user=request.user,
+            certification_image=certification_image,
+            owner_name=owner_name,
+            store_name=store_name,
+            expiry_date_from=expiry_date_from,
+            expiry_date_to=expiry_date_to,
+        )
+        certification.save()
+        return redirect('successseller')  # Redirect to a success page
 
     return render(request, 'seller/dashseller.html', {
         'existing_certification': existing_certification,
@@ -276,7 +294,6 @@ def viewaddproduct(request):
     existing_certification = Certification.objects.filter(user=request.user).first()
 
     if not existing_certification:
-        messages.error(request, 'You need an approved certification to add products.')
         return redirect('seller_index')
 
     try:
@@ -375,45 +392,6 @@ def delete_product(request, product_id):
     # Redirect back to the viewproducts page or wherever you want to go after deletion.
     return redirect('viewproducts')
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# def update_product(request, product_id):
-#     product = Product.objects.get(id=product_id)
-
-#     if request.method == 'POST':
-#         product.category_name = request.POST['category_name']
-#         product.category_description = request.POST['category_description']
-#         product.save()
-#         return redirect('viewcategory') 
-
-#     return render(request, 'admin/edit_category.html', {'product': product})
 @login_required
 def dashlegal(request):
     # Retrieve Certification objects including their IDs
@@ -438,26 +416,36 @@ def dashlegal(request):
     }
     return render(request, 'admin/dashlegal.html', context)
 
+def logoutmessage(request):
+    return render(request,'logoutmessage.html')
+
 @login_required
 def addcategory(request):
     if request.method == 'POST':
         try:
             # Retrieve form data directly from the request
             category_name = request.POST.get('category_name')
+            formatted_category_name = category_name.capitalize()
             category_description = request.POST.get('category_description')
            
 
             # Create a new Category instance with the form data
-            category = Category(
-                category_name=category_name,
-                category_description=category_description,
-                
+            category, created = Category.objects.get_or_create(
+                category_name=formatted_category_name,
+                defaults={'category_description': category_description}
             )
-            category.save()
+            if created:
+                # The category was created
+                messages.success(request, 'Category created successfully.')
+            else:
+                # The category already exists
+                messages.error(request, 'Category already exists.')
+
+            return redirect('successaddcategory')
 
             # Display a success message
-            messages.success(request, 'Category created successfully.')
-            return redirect('successaddcategory')  # Redirect back to the admin page
+            # messages.success(request, 'Category created successfully.')
+              # Redirect back to the admin page
 
         except IntegrityError as e:
             # Handle database integrity error (e.g., unique constraint violation)
@@ -485,13 +473,20 @@ def delete_category(request, category_id):
 
 @login_required
 def edit_category(request, category_id):
-    category = Category.objects.get(id=category_id)
+    category = get_object_or_404(Category, id=category_id)
 
     if request.method == 'POST':
-        category.category_name = request.POST['category_name']
-        category.category_description = request.POST['category_description']
-        category.save()
-        return redirect('viewcategory')  # Replace 'category_list' with your category list URL name
+        new_category_name = request.POST['category_name']
+          # Check if a category with the same name already exists
+        if Category.objects.filter(category_name=new_category_name).exclude(id=category.id).exists():
+            messages.error(request, 'Category with this name already exists.')
+        else:
+            # Update the category if no duplicate name found
+        
+            category.category_name = request.POST['category_name']
+            category.category_description = request.POST['category_description']
+            category.save()
+            return redirect('viewcategory')  # Replace 'category_list' with your category list URL name
 
     return render(request, 'admin/edit_category.html', {'category': category})
 
@@ -515,6 +510,37 @@ def reject_certification(request, certification_id):
 def user_list(request):
     users = User.objects.all()
     return render(request, 'admin/userlist.html', {'users': users})
+
+@login_required
+def activate_user(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    if request.method == 'POST':
+        user.is_active = True
+        user.save()
+    return redirect('user_list')
+
+@login_required
+def deactivate_user(request, user_id):
+    user = get_object_or_404(User, id=user_id)
+    if request.method == 'POST':
+        user.is_active = False
+        user.save()
+    return redirect('user_list')
+
+from django.views.decorators.csrf import csrf_exempt
+@csrf_exempt  # Use csrf_exempt for simplicity; consider using a csrf token for security in production
+def delete_user(request, user_id):
+    # Check if the request method is POST (for safety, you might want to use a confirmation modal before sending the request)
+    if request.method == 'POST':
+        # Get the user object to delete
+        user = get_object_or_404(User, id=user_id)
+
+        # Check if the user can be deleted (e.g., you might want to add custom logic here)
+        if not user.is_superuser:
+            user.delete()
+            return JsonResponse({'message': 'User deleted successfully.'})
+
+    return JsonResponse({'error': 'Unable to delete user.'}, status=400)
 
 @login_required
 def edit_user(request, user_id):
@@ -542,15 +568,18 @@ def edit_user(request, user_id):
 
     return render(request, 'admin/edituser.html', {'user': user})
 
+@login_required 
 def view_products(request):
     product_summaries = ProductSummary.objects.all()
     return render(request, 'admin/viewstock.html', {'product_summaries': product_summaries})
 
+@login_required 
 def edit_product_stock(request, pk):
     product_summary = get_object_or_404(ProductSummary, pk=pk)
 
     if request.method == 'POST':
         # Update the product details based on the form submission
+        product_summary.product_sci_name = request.POST['product_sci_name']
         product_summary.product_description = request.POST['product_description']
         product_summary.product_price = request.POST['product_price']
         product_summary.product_image = request.FILES.get('product_image')  # Use get to handle optional file upload
@@ -565,6 +594,7 @@ def edit_product_stock(request, pk):
 
     return render(request, 'admin/editstock.html', {'product_summary': product_summary})
 
+@login_required 
 def edit_product(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     categories = Category.objects.all()  # Assuming you have a 'Category' model
@@ -603,3 +633,165 @@ def delete_add_product(request, product_id):
         return redirect('viewaddproduct')  # Redirect to the product list page
 
     return render(request, 'seller/delete_add_product.html', {'product': product})
+
+
+def store(request): 
+    product_summaries = ProductSummary.objects.all() 
+    list1=[]
+    for summary in product_summaries:
+        if request.user.is_authenticated:
+            in_wishlist = is_in_wishlist(request,summary)
+        else:
+            in_wishlist=False
+        book_data = {
+                'product_summaries': summary,
+                'in_wishlist': in_wishlist,
+            }
+        list1.append(book_data)  
+    return render(request, 'usertems/store.html', {'product_summaries':list1})
+
+
+def is_in_wishlist(request,summary):
+    user = request.user
+    is_in_wishlist=Wishlist.objects.filter(user=user, product=summary).first()
+    if is_in_wishlist:
+        return True
+    else:
+        False
+
+def storewishlist(request):
+    product_summaries = ProductSummary.objects.all()   
+    return render(request, 'usertems/store.html', {'product_summaries': product_summaries})
+
+def product_single(request, product_id):
+    product = get_object_or_404(ProductSummary, pk=product_id)
+    user = request.user
+
+
+    if request.user.is_authenticated:
+    # Check if the product is already in the user's cart
+        existing_wishlist_item = Wishlist.objects.filter(user=user, product=product).first()
+        is_in_wishlist = existing_wishlist_item is not None
+
+    else:
+        is_in_wishlist=False
+    if request.method == 'POST':
+        image = product.product_image
+
+        if not is_in_wishlist:
+            # If the product is not in the cart, add it to the cart with the specified quantity
+            Wishlist.objects.create(user=user, product=product, image=image)
+        else:
+            print("Already in Cart")
+
+        return redirect('product_single',product_id=product_id)
+    
+    return render(request, 'usertems/product.html', {'product': product,'is_in_wishlist': is_in_wishlist})
+
+# def saveproduct(request):
+#     return render(request,'usertems/save.html')
+
+def wishlist_view(request):
+    # Assuming you have user authentication and each user has a unique cart
+    user = request.user
+
+    # Retrieve the user's cart items
+    wishlist_items = Wishlist.objects.filter(user=user)
+
+    context = {
+        'wishlist_items': wishlist_items,
+    }
+
+    return render(request, 'usertems/wishlist.html', context)
+
+def remove_from_wishlist(request, wishlist_item_id):
+    wishlist_item = get_object_or_404(Wishlist, id=wishlist_item_id)
+
+    if request.method == 'POST':
+        wishlist_item.delete()
+
+    return redirect('wishlist')  
+
+def remove_storewishlist(request, wishlist_item_id):
+    wishlist_item = get_object_or_404(Wishlist, id=wishlist_item_id)
+
+    if request.method == 'POST':
+        wishlist_item.delete()
+
+    return redirect('store') 
+
+def remove_productwishlist(request, wishlist_item_id):
+    wishlist_item = get_object_or_404(Wishlist, id=wishlist_item_id)
+
+    if request.method == 'POST':
+        wishlist_item.delete()
+
+    return redirect('product_single') 
+
+def remove_indexwishlist(request, wishlist_item_id):
+    wishlist_item = get_object_or_404(Wishlist, id=wishlist_item_id)
+
+    if request.method == 'POST':
+        wishlist_item.delete()
+
+    return redirect('index.html') 
+
+def add_productwishlist(request, product_id):
+    product = get_object_or_404(ProductSummary, pk=product_id)
+    user = request.user
+
+    # Check if the product is already in the user's cart
+    existing_wishlist_item = Wishlist.objects.filter(user=user, product=product).first()
+    is_in_wishlist = existing_wishlist_item is not None
+
+    if request.method == 'POST':
+        image = product.product_image
+
+        if not is_in_wishlist:
+            # If the product is not in the cart, add it to the cart with the specified quantity
+            Wishlist.objects.create(user=user, product=product, image=image)
+        else:
+            print("Already in Cart")
+
+        return redirect('product_single',product_id=product_id)
+    return render(request, 'usertems/product.html', {'product': product,'is_in_wishlist': is_in_wishlist})
+
+def add_storewishlist(request, product_id):
+    product = get_object_or_404(ProductSummary, pk=product_id)
+    user = request.user
+
+    # Check if the product is already in the user's cart
+    existing_wishlist_item = Wishlist.objects.filter(user=user, product=product).first()
+    is_in_wishlist = existing_wishlist_item is not None
+
+    if request.method == 'POST':
+        image = product.product_image
+
+        if not is_in_wishlist:
+            # If the product is not in the cart, add it to the cart with the specified quantity
+            Wishlist.objects.create(user=user, product=product, image=image)
+        else:
+            print("Already in Cart")
+
+        return redirect('store')
+    return render(request, 'usertems/store.html', {'product': product,'is_in_wishlist': is_in_wishlist})
+
+def add_indexwishlist(request, product_id):
+    product = get_object_or_404(ProductSummary, pk=product_id)
+    user = request.user
+
+    # Check if the product is already in the user's cart
+    existing_wishlist_item = Wishlist.objects.filter(user=user, product=product).first()
+    is_in_wishlist = existing_wishlist_item is not None
+
+    if request.method == 'POST':
+        image = product.product_image
+
+        if not is_in_wishlist:
+            # If the product is not in the cart, add it to the cart with the specified quantity
+            Wishlist.objects.create(user=user, product=product, image=image)
+        else:
+            print("Already in Cart")
+
+        return redirect('index.html')
+    return render(request, 'index.html', {'product': product,'is_in_wishlist': is_in_wishlist})

@@ -1,3 +1,4 @@
+
 {% load static %}
 
 <html>
@@ -22,17 +23,16 @@
                 <div class="collapse navbar-collapse" id="navbarCollapse">
                     <div class="navbar-nav ms-auto" style="text-decoration: none;
                     text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px;">
-                        <a href="#" class="nav-item nav-link active text animated zoomIn">Home</a>
-                        <a href="#products" class="nav-item nav-link text animated zoomIn">Plants</a>
-                        <a href="#" class="nav-item nav-link text animated zoomIn">Rental</a>
-                        <a href="#" class="nav-item nav-link text animated zoomIn">Store</a>
+                    <a href="{% url 'index' %}" class="nav-item nav-link active text animated zoomIn" style="font-weight: lighter;">Home</a>
+                    <a href="{% url 'store' %}" class="nav-item nav-link text animated zoomIn" style="font-weight: lighter;" >Store</a>
 
                         {% comment %} {% if request.session.username %} {% endcomment %}
                         {% if user.is_authenticated %}
 
+                        
                         <div class="nav-item dropdown">
                             {% if user.userprofile.profile_pic %}
-					        <img src="{{ user.userprofile.profile_pic.url }}" alt="" width="35" height="35" style="box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px; margin-top:20px;" class="rounded-circle">
+					        <img src="{{ user.userprofile.profile_pic.url }}" alt="" width="30" height="30" style="box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px; margin-top:20px;" class="rounded-circle animated zoomIn">
 					        {% else %}
                             <a href="#" class="nav-link dropdown-toggle text animated zoomIn" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user-circle"></i></a>
 					        {% endif %}
@@ -47,8 +47,12 @@
                         {% endif %}
                         
                     </div>
-                    <div class="border-start ps-4 d-none d-lg-block">
-                        <button type="button" class="btn btn-sm p-0" style="margin-left:10px;"><i class="fa fa-search"></i></button>
+                    {% if user.is_authenticated %}
+                    <div class=" ps-4 d-none d-lg-block">
+                        <a class="btn btn-dark rounded-pill m-2 animated zoomIn" style="padding-top:7px; height:30px; width:30px;  box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px; margin-top:20px;" href="{% url 'wishlist' %}"><i style="margin-left:-5px; " class="fa fa-heart"></i></a>
+                    </div>
+                    {% endif %}
+                        
                     </div>
                 </div>
             </nav>

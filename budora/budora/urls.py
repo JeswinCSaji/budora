@@ -26,6 +26,7 @@ urlpatterns = [
     path('register.html',views.register, name='register'),
     path('login.html',views.loginu,  name='loginu'),
     path('index.html', views.index, name='index'),
+    path('logoutmessage/', views.logoutmessage, name='logoutmessage'),
     path('logout/', views.loggout, name='loggout'),
     path('accounts/', include('allauth.urls')),
     
@@ -36,6 +37,8 @@ urlpatterns = [
     path('viewaddproduct', views.viewaddproduct, name='viewaddproduct'),
     path('addproducts', views.addproducts, name='addproducts'),
     path('viewproducts', views.viewproducts, name='viewproducts'),
+    path('store', views.store, name='store'),
+    path('product', views.product, name='product'),
 
     path('saveproduct', views.saveproduct, name='saveproduct'),
 
@@ -75,8 +78,20 @@ urlpatterns = [
 
     path('viewstock', views.view_products, name='viewstock'),
     path('product-summary/<int:pk>/edit/', views.edit_product_stock, name='edit_product_stock'),
+    path('product_single/<int:product_id>/', views.product_single, name='product_single'),
+    path('wishlist/', views.wishlist_view, name='wishlist'),
+    path('remove_from_wishlist/<int:wishlist_item_id>/',views.remove_from_wishlist, name='remove_from_wishlist'),
+    # path('remove_storewishlist/<int:wishlist_item_id>/',views.remove_storewishlist, name='remove_storewishlist'),
+    path('remove_productwishlist/<int:wishlist_item_id>/',views.remove_productwishlist, name='remove_productwishlist'),
+    # path('remove_indexwishlist/<int:wishlist_item_id>/',views.remove_indexwishlist, name='remove_indexwishlist'),
+    path('add_productwishlist/<int:product_id>/', views.add_productwishlist, name='add_productwishlist'),
+    # path('add_indexwishlist/<int:product_id>/', views.add_indexwishlist, name='add_indexwishlist'),
+    # path('add_storewishlist/<int:product_id>/', views.add_indexwishlist, name='add_storewishlist'),
     #userlist
     path('user_list', views.user_list, name='user_list'),
+    path('activate_user/<int:user_id>/', views.activate_user, name='activate_user'),
+    path('deactivate_user/<int:user_id>/', views.deactivate_user, name='deactivate_user'),
+    path('delete_user/<int:user_id>/', views.delete_user, name='delete_user'),
     path('edit_user/<int:user_id>/', views.edit_user, name='edit_user'),
 ]
 

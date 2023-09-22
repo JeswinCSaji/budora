@@ -29,23 +29,23 @@
               {% csrf_token %}
               <div class="form-group mb-3" style="margin-top: 30px;">
                   <label for="product_name">Plant Name:</label>
-                  <input type="text" id="product_name" name="product_name" class="form-control" oninput="validateProductName()">
+                  <input type="text" id="product_name" name="product_name" class="form-control" oninput="validateProductName()" required>
                   <span id="product_name_error" class="text-danger"></span>
               </div>
               <div class="form-group mb-3" style="margin-top: 10px;">
                   <label for="product_description">Plant Description:</label>
-                  <textarea id="product_description" name="product_description" class="form-control" rows="4" oninput="validateProductDescription()"></textarea>
+                  <textarea id="product_description" name="product_description" class="form-control" rows="4" oninput="validateProductDescription()" required></textarea>
                   <span id="product_description_error" class="text-danger"></span>
               </div>
               <div class="form-group mb-3" style="margin-top: 10px;">
                   <label for="product_price">Plant Price:</label>
                  
-                  <input type="text" id="product_price" name="product_price" class="form-control" oninput="validateProductPrice()">
+                  <input type="text" id="product_price" name="product_price" class="form-control" oninput="validateProductPrice()" required>
                   <span id="product_price_error" class="text-danger"></span>
               </div>
               <div class="form-group mb-3" style="margin-top: 10px;">
                 <label for="product_stock">Enter Stock(in KG):</label>     
-                <input type="text" id="product_stock" name="product_stock" class="form-control" oninput="validateProductstock()">
+                <input type="text" id="product_stock" name="product_stock" class="form-control" oninput="validateProductstock()" required>
                 <span id="product_stock_error" class="text-danger"></span>
             </div>
               <div class="form-group mb-3" style="margin-top: 10px;">
@@ -60,7 +60,7 @@
               </div>
               <div class="form-group mb-3" style="margin-top: 10px;">
                   <label for="product_image">Category Image:</label>
-                  <input type="file" id="product_image" name="product_image" accept="image/*" oninput="validateProductImage()">
+                  <input type="file" id="product_image" name="product_image" accept="image/*" oninput="validateProductImage()" required>
                   <span id="product_image_error" class="text-danger"></span>
               </div>
               <input type="hidden" name="product_form" value="1">

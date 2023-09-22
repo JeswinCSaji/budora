@@ -7,29 +7,71 @@
 
 <body>
   {% block content %}
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
     <!--  Main wrapper -->
     <div class="body-wrapper">
       <div class="container-fluid">
         <div class="card" style="border-style: none; box-shadow: black 0px 20px 30px -10px;">
           <div class="card-body">
             <h5 class="card-title fw-semibold mb-4">Add Plant Category</h5>
-            <form method="post" enctype="multipart/form-data">
+            <script>
+              function validateForm() {
+                  const category_nameInput = document.getElementById('category_name');
+                  const category_nameError = document.getElementById('category_name_error');
+                  const category_nameValue = category_nameInput.value.trim();
+          
+                  const category_descriptionInput = document.getElementById('category_description');
+                  const category_descriptionError = document.getElementById('category_description_error');
+                  const category_descriptionValue = category_descriptionInput.value.trim();
+          
+                  let isValid = true;
+          
+                  // Validate Category Name
+                  if (category_nameValue === '') {
+                      category_nameError.textContent = 'Category Name cannot be empty.';
+                      isValid = false;
+                  } else if (!/^[A-Za-z\s]+$/.test(category_nameValue)) {
+                      category_nameError.textContent = 'Category Name should contain only alphabetic characters.';
+                      isValid = false;
+                  } else {
+                      category_nameError.textContent = '';
+                  }
+          
+                  // Validate Category Description
+                  if (category_descriptionValue === '') {
+                    category_descriptionError.textContent = 'Category Description cannot be empty.';
+                    isValid = false;
+                  } 
+                  else if (!/^[A-Za-z\s]*$/.test(category_descriptionValue)) {
+                      category_descriptionError.textContent = 'Category Description should contain only alphabetic characters and spaces.';
+                      isValid = false;
+                  } else {
+                      category_descriptionError.textContent = '';
+                  }
+          
+                  return isValid;
+              }
+          </script>
+          
+          <form method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
               {% csrf_token %}
               <div class="form-group" style="margin-top: 30px;">
                   <label for="category_name">Category Name:</label>
                   <input type="text" id="category_name" name="category_name" class="form-control" required>
+                  <span id="category_name_error" class="text-danger"></span>
               </div>
               <div class="form-group" style="margin-top: 10px;">
                   <label for="category_description">Category Description:</label>
                   <textarea id="category_description" name="category_description" class="form-control"></textarea>
+                  <span id="category_description_error" class="text-danger"></span>
               </div>
               <button type="submit" class="btn btn-primary" style="margin-top: 30px;">Create Category</button>
           </form>
+          
           </div>
         </div>
       </div>
-    </div>
-  </div>
   {% endblock %}
 </body>
 </html>

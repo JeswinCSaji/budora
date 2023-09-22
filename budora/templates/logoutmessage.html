@@ -1,0 +1,28 @@
+{% load static %}
+
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <title>Login</title>
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+</head>
+
+<body style="background-image: url({% static 'images/5.png' %}); background-repeat: no-repeat; background-size: cover;">
+    <nav class="Logo">
+        <div class="container">
+            <img id="logoimg" src="{% static 'images/8.png' %}">
+            <a id="logoname" href="#">BUDORA </a>
+        </div>
+    </nav>
+    <div class="signin" style="width:300px; padding:20; background-color:white; ">
+            <p id="signintext1">Logout</p>
+            <hr id="signintext2">
+            <h2 id="signintext3">Are you sure you want to logout?</h2>  
+            <button class="signinbtn" type="submit" style=" margin-left: 95px;">Logout</button>
+        </div>
+
+</body>
+</html>
+
