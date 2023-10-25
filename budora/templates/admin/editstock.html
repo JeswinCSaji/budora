@@ -22,16 +22,15 @@
                     <textarea class="form-control" id="product_description" name="product_description" required>{{ product_summary.product_description }}</textarea>
                     <p id="plant_description_error" style="color: red;"></p>
                 </div>
-                <div class="form-group">
-                    <label for="product_price">Plant Price:</label>
-                    <input type="text" id="product_price" name="product_price" class="form-control" value="{{ product_summary.product_price }}" required>
-                    <p id="product_price_error" style="color: red;"></p>
-
-                </div>
                 <!-- Input field for image upload if needed -->
                 <div class="form-group">
                     <label for="product_image">Plant Image</label>
+                    {% if product_summary.product_image %}
+                    <input type="file" class="form-control" id="product_image" name="product_image" value="{{ product_summary.product_image.url }}">
+                    {% else %}
                     <input type="file" class="form-control" id="product_image" name="product_image">
+                    {% endif %}
+
                     <p id="plant_image_error" style="color: red;"></p>
                 </div>
                 <div class="form-group">
@@ -70,7 +69,7 @@
                     <p id="maintenance_instructions_error" style="color: red;"></p>
 
                 </div>
-                <button type="submit" class="btn btn-edit" href="{% url 'viewstock' %}">Save</button>
+                <button type="submit" class="btn btn-primary" href="{% url 'viewstock' %}">Save</button>
             </form>
         </div>
     </div>

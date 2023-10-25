@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import Seller
 from .models import Certification
 from .models import Category, Product, UserProfile
-from .models import ProductSummary
+from .models import ProductSummary,Recommend
 
 # Register your models here.
 admin.site.register(Seller)
@@ -39,3 +39,40 @@ class WishlistAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'product__product_name')
 
 admin.site.register(Wishlist, WishlistAdmin)
+
+from django.contrib import admin
+from .models import Cart, BillingDetails, Order, OrderItem,Review
+
+admin.site.register(Review)
+admin.site.register(Recommend)
+
+# Register the Cart model
+@admin.register(Cart)
+class CartAdmin(admin.ModelAdmin):
+    list_display = ('user', 'product', 'quantity', 'price', 'date_added')
+    list_filter = ('user', 'product')
+    search_fields = ('user__username', 'product__product_name')
+    list_per_page = 20
+
+# Register the BillingDetails model
+@admin.register(BillingDetails)
+class BillingDetailsAdmin(admin.ModelAdmin):
+    list_display = ('user', 'first_name', 'last_name', 'email', 'phone')
+    search_fields = ('user__username', 'email')
+    list_per_page = 20
+
+# Register the Order model
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
+    list_display = ('user', 'total_price', 'order_date', 'payment_status')
+    list_filter = ('user', 'payment_status')
+    search_fields = ('user__username',)
+    list_per_page = 20
+
+# Register the OrderItem model
+@admin.register(OrderItem)
+class OrderItemAdmin(admin.ModelAdmin):
+    list_display = ('order', 'product', 'seller', 'quantity', 'price', 'total_price')
+    list_filter = ('order', 'product', 'seller')
+    search_fields = ('order__user__username', 'product__product_name', 'seller__seller_name')
+    list_per_page = 20

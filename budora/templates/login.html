@@ -17,16 +17,13 @@
             <a id="logoname" href="#">BUDORA </a>
         </div>
     </nav>
-    {% if messages %}
-    <div class="error-message" style=" border-style:groove; border-color:red; border-width: 2px; box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px; margin-left:43%; height:35px; width:250px; margin-top:-20px; ">
+    {% if login_error_message %}
+    <div class="error-message" style=" border-style:groove; border-color:red; border-width: 2px; box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px; margin-left:43%; height:35px; width:180px; margin-top:-20px; ">
         <p style="color: red; margin-left: 20px; margin-top:5px; font-size:larger;">
-                   
-                        {% comment %} {{ message }} {% endcomment %}
-                        INVALID CREDENTIALS
-                 
+            {{ login_error_message }}      
         </p>
     </div>
-            {% endif %}
+    {% endif %}
     <div class="signin">
 
         <div id="signintext">

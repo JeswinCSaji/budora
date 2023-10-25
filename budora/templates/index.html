@@ -45,7 +45,7 @@
             <nav class="navbar navbar-expand-lg bg-white navbar-light py-2 py-lg-0">
                 <a href="index.html" class="navbar-brand animated rubberBand" id="budoralogo" >
                     <img class="img-fluid" src="{% static 'images/8.png' %}" alt="Logo">
-                    <a id="logoname" class="animated rubberBand" href="#">BUDORA </a>
+                    <a id="logoname" class="animated rubberBand" href="#" style="margin-top:0px;">BUDORA </a>
                 </a>
                 <button type="button" class="navbar-toggler ms-auto me-0" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                     <span class="navbar-toggler-icon"></span>
@@ -53,24 +53,66 @@
                 <div class="collapse navbar-collapse" id="navbarCollapse">
                     <div class="navbar-nav ms-auto" style="text-decoration: none;
                     text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px;">
+
+                    <form class="nav-item nav-link text animated zoomIn" style="font-weight: lighter;margin-top:-6px;" id="search-form">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="search-input" placeholder="Search for products">
+                            <div class="input-group-append">
+                                <button class="btn btn-outline-primary" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <ul id="search-results" class="list-group" style="position: absolute; width: 100%; display: none;">
+                            <!-- Search results will be populated here as list items -->
+                        </ul>
+                                                                 
+                    </form>
+
+
+
+
+
+
+
+
+
+
+                    
+
+
+
+
+        
+
+
+
+
+
+
+
+
                         <a href="{% url 'index' %}" class="nav-item nav-link active text animated zoomIn" style="font-weight: lighter;">Home</a>
-                        <a href="{% url 'store' %}" class="nav-item nav-link text animated zoomIn" style="font-weight: lighter;">Store</a>
+                        <a href="{% url 'store' %}" class="nav-item nav-link text animated zoomIn" style="font-weight: lighter;" id="store">Store</a>
                         {% comment %} <a href="#" class="nav-item nav-link text animated zoomIn">Rental</a>
                         <a href="#" class="nav-item nav-link text animated zoomIn">Store</a> {% endcomment %}
-
+                        
                         {% comment %} {% if request.session.username %} {% endcomment %}
                         {% if user.is_authenticated %}
-
-                        <div class="nav-item dropdown">
+                        <a href="{% url 'cart' %}" class="nav-item nav-link text animated zoomIn" style="font-weight: lighter;"><i class="fas fa-shopping-cart"></i></a>
+                        <a href="{% url 'wishlist' %}" class="nav-item nav-link text animated zoomIn" style="font-weight: lighter;"><i class="fa fa-heart"></i></a>               
+                        <div class="nav-item dropdown" id="logz">
                             {% if user.userprofile.profile_pic %}
-					        <img src="{{ user.userprofile.profile_pic.url }}" alt=""  width="30" height="30" style=" box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px; margin-top:20px;" class="rounded-circle animated zoomIn">
+					        <img src="{{ user.userprofile.profile_pic.url }}" alt=""  width="30" height="30" style=" box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px; margin-top:20px;" class="rounded-circle animated zoomIn" >
 					        {% else %}
                             <a href="#" class="nav-link dropdown-toggle text animated zoomIn" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user-circle"></i></a>
 					        {% endif %}
                             <div class="dropdown-menu bg-light rounded-0 m-0">
                                 <p class="dropdown-item">{{ user.userprofile.name }}</p>
                                 <a href="{% url 'profile' %}" class="dropdown-item">Profile</a>
-                                <a href="{% url 'loggout' %}" class="dropdown-item">Logout</a>
+                                <a href="{% url 'orders' %}" class="dropdown-item">Orders</a>
+                                <a href="#" class="dropdown-item" onclick="confirmLogout();" id="logoutt" >Logout <i class="fa fa-arrow-right"></i></a>
                             </div>
                         </div>
                         {% else %}
@@ -78,16 +120,69 @@
                         {% endif %}
                         
                     </div>
-                    {% if user.is_authenticated %}
-                    <div class="ps-4 d-none d-lg-block">
-                        <a class="btn btn-dark rounded-pill m-2 animated zoomIn" style="padding-top:4px; height:30px; width:30px;  box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px; margin-top:20px;" href="{% url 'wishlist' %}"><i style="margin-left:-5.5px; " class="fa fa-heart"></i></a>
-                    </div>
-                    {% endif %}
                 </div>
             </nav>
         </div>
     </div>
     <!-- Navbar End -->
+
+
+
+    
+
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#search-input').keyup(function () {
+                var query = $(this).val();
+                $.ajax({
+                    type: 'GET',
+                    url: '/live_search/',
+                    data: {
+                        'query': query
+                    },
+                    success: function (data) {
+                        var results = data.products;
+                        var resultsHtml = '';
+                        resultsHtml += '<ul class="list-group">'; // Start the list
+                            if (results.length === 0) {
+                                resultsHtml += '<li class="list-group-item">No products found</li>';
+                            } else {
+                                for (var i = 0; i < results.length; i++) {
+                                    var prod_id = results[i].prod_id;
+                                    resultsHtml += '<li class="list-group-item" style="background-color:black;"><a href="/product_single/' + prod_id + '">' + results[i].name + '</a></li>';
+                                }
+                            }
+                            resultsHtml += '</ul>'; // End the list
+        
+                        if (query) {
+                            $('#search-results').html(resultsHtml);
+                            $('#search-results').show();
+                        } else {
+                            $('#search-results').hide();
+                        }
+        
+                        // Handle click events on the links with data-prod-id attribute
+                        $('.text-truncate[data-prod-id]').on('click', function (e) {
+                            e.preventDefault();
+                            var prodId = $(this).data('prod-id');
+                            // Construct the URL using JavaScript and navigate to it
+                            var url = '/product_single/' + prodId + '/';
+                            window.location.href = url;
+                        });
+                    }
+                });
+            });
+        });
+        
+    </script>
+
+
+
+
+
+
 
  
     <!-- Carousel Start -->
@@ -240,26 +335,30 @@
             </div>
             <div class="owl-carousel product-carousel wow fadeInUp" data-wow-delay="0.5s">
                 {% for product_summary in product_summaries %}
-                {% if product_summary.product_summaries.total_stock > 0 %}
+                {% if product_summary.product_summaries.total_stock > 0 and product_summary.product_summaries.stock_is_approved == 'approved'%}
                 <div href="" class="d-block product-item rounded">
                     {% if product_summary.product_summaries.product_image %}
                     <img src="{{ product_summary.product_summaries.product_image.url }}" alt="{{ product_summary.product_summaries.product_name }}" style="height: 400px;">                      
                     {% else %}
                     <img src="{% static 'images/noim2.png' %}" alt="No Image" style="height: 400px;">                      
                     {% endif %}
-                    <div class="bg-white text-center p-4 position-relative mt-n5 mx-4" style="box-shadow: rgba(0, 0, 0, 0.06) 0px 2px 4px 0px inset;">                      
-                        <a style="text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px; font-size:x-large;" href="{% url 'product_single' product_summary.product_summaries.id %}" class="text-primary">{{ product_summary.product_summaries.product_name }}</a>
-                        {% if user.is_authenticated %}
-                        <form method="post" style="margin-top:20px; padding-left:120px;">
-                            {% csrf_token %}
+                    <div class="bg-white text-center p-4 position-relative mt-n6 mx-4" >                      
+                        <a style="text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px; font-size:larger;" href="{% url 'product_single' product_summary.product_summaries.id %}" class="text-primary">{{ product_summary.product_summaries.product_name }}</a>
+                        {% comment %} {% if user.is_authenticated %}                                     
                             {% if product_summary.in_wishlist %}
-                                <p style="text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px; background-color:#88B44E; padding-top:7px;padding-bottom:7px;width:70px;border-radius:180px;" ><i class="bi bi-heart-fill" style="color:white;"></i></p>
+                            <form method="post" action="{% url 'remove_indexwishlist' product_summary.product_summaries.id %}">
+                                {% csrf_token %}
+                                <button style="text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px; background-color:#88B44E; padding-top:7px;padding-bottom:7px;width:50px;border-radius:180px;border-style:none;" type="submit"><i class="bi bi-heart-fill" style="color:white;"></i></button>
+                            </form>
                             {% else %}
-                                <p style="text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px;  background-color:#88B44E; padding-top:7px;padding-bottom:7px;width:70px;border-radius:180px;"><i class="bi bi-heart" style="color:white;"></i></p>
+                            <form method="post" action="{% url 'add_productwishlist' product_summary.product_summaries.id %}">
+                                {% csrf_token %}
+                                <button  style="text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px;  background-color:#88B44E; padding-top:7px;padding-bottom:7px;width:50px;border-radius:180px;border-style:none;" type="submit"><i class="bi bi-heart" style="color:white;"></i></button>
+                            </form>
                             {% endif %}
-                        </form>
+                        {% endif %} {% endcomment %}
 
-                        {% endif %}
+                       
                     </div>                   
                 </div>
                 {% endif %}
@@ -344,8 +443,34 @@
     <script src="{% static 'lib/waypoints/waypoints.min.js' %}"></script>
     <script src="{% static 'lib/owlcarousel/owl.carousel.min.js' %}"></script>
 
+
     <!-- Template Javascript -->
     <script src="{% static 'js/main.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function confirmLogout() {
+            // Create a custom styled confirmation dialog
+            var confirmation = confirm("Are you sure you want to logout?");
+            
+            // Style the confirmation dialog
+            if (confirmation) {
+                // If the user confirms, redirect to the logout URL
+                window.location.href = "{% url 'loggout' %}";
+            } else {
+                // If the user cancels, do nothing
+            }
+            
+            // Apply custom styles to the confirmation dialog
+            var dialogBox = document.querySelector('.confirm-dialog');
+            if (confirmation && dialogBox) {
+                dialogBox.style.backgroundColor = 'green'; // Change the background color
+                dialogBox.style.color = 'white'; // Change the text color
+                // Add more custom styles as needed
+            }
+        }
+        </script>
+        
+        
 </body>
 
 </html>

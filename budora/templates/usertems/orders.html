@@ -1,0 +1,277 @@
+{% extends 'usertems/base.html' %}
+{% load static %}
+
+{% block content %}
+<style>
+    #logoname
+    {
+        font-family: sans-serif;
+                        color:#27350F;
+                        text-decoration: none;
+                        text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px;
+                    font-size: larger;
+                    margin-top:-37px;
+                    
+    }
+    @media (max-width: 991.98px) {
+        #logoname
+        {
+            font-size: medium;
+            margin-top:0px;
+        }
+    }
+
+    /* Background Overlay Styles */
+.overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9998; /* Place it below the modal */
+}
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+             /* Adjust the top value to shift the modal down */
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+    
+        .modal-content {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;
+                        max-width: 400px;
+            margin: 0 auto;
+            margin-top: 10%;
+        }
+    
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+    
+        label {
+            display: block;
+            margin-bottom: 10px;
+        }
+    
+        input[type="number"],
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+    
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: #fff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            
+        }
+    
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+    
+</style>
+<link href="{% static 'css/tablestyle.css' %}" rel="stylesheet">
+
+<section class="ftco-section ftco-cart">
+    <div class="col-lg-12 grid-margin stretch-card">
+        <div class=".card-inverse-success">
+          <div class="card-body">
+                <div class="table-responsive">
+                    <hr  class="text animated zoomIn" id="usern2">
+                    <h2 style="margin-left:5px;margin-bottom:50px;margin-left:50px;text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px;">Order Details</h2>
+                   
+                    <table class="table table-hover">
+                        <thead class="thead-primary">
+                            <tr class="text-center" >
+                                <th style="color:black;font-weight:bolder;">Order Date</th>
+                                <th style="color:black;font-weight:bolder;" >Product Name</th>
+                                <th style="color:black;font-weight:bolder;" >Quantity</th>
+                                <th style="color:black;font-weight:bolder;" >Image</th>
+                                <th style="color:black;font-weight:bolder;" >Price</th>
+                                <th style="color:black;font-weight:bolder;" >Seller Name</th>
+                                <th style="color:black;font-weight:bolder;" >Status</th>
+                                <th style="color:black;font-weight:bolder;" >Total Paid Amount</th>
+                                <th style="color:black;font-weight:bolder;" >Product Recieved</th>
+                                <th style="color:black;font-weight:bolder;" >Download</th>
+                                <th style="color:black;font-weight:bolder;" >Review</th>
+
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for order, item, review_status in order_items %}
+
+                            <tr class="text-center">
+                                <td>{{ order.order_date }}</td>
+                                <td>
+                                    
+                                    {{ item.product.product_name }}
+                                    
+                                </td>
+                                <td>{{ item.quantity }}</td>
+                                <td>
+                                    <img src="{{ item.product.product_image.url }}" alt="{{ item.product.name }}" width="100">
+                                    <br>
+                                </td>
+                                <td>
+                                    {{ item.price }}
+                                    <br>
+                                </td>
+                                <td>
+                                    {{ item.product.seller.storename }}
+                                    
+                                </td>
+                                <td> 
+                                    {% if order.get_payment_status_display == 'Pending' %}
+                                    <label class="badge badge-dark">Pending</label>
+                                    {% else %}
+                                    <label class="badge badge-dark">Paid<i style="margin-left:5px;height:1px;" class="fas fa-check"></i></label>
+                                    {% endif %}
+                                </td>
+                                <td>{{ order.total_price }}</td>
+                                <td>
+                                    {% if item.customer_is_approved == 'notcollected' %}
+                                    <form method="post" action="{% url 'customer_approve_order' item.id %}">
+                                        {% csrf_token %}
+                                        <button class="btn btn-inverse-success btn-fw"  type="submit" >Confirm</button>
+                                    </form>
+                                    {% else %}
+                                    <label class="badge badge-success">Recieved</label>
+                                    {% endif %}
+                                </td>
+                                <td >
+                                    <a href="{% url 'generate_pdf' order.id %}" target="_blank">
+                                        <i class="fas fa-download"></i>
+                                    </a>
+                                </td>
+                                <td >
+                                   
+                                    {% if item.customer_is_approved == 'collected' %}       
+                                    {% if review_status == 'Pending' %}
+                                        <button class="btn btn-outline-success btn-fw openModalBtn" data-seller="{{ item.product.seller.id }}" data-seller-name="{{ item.product.seller.storename }}" type="button" >Review</button>
+                                    {% else %}
+                                        <button class="btn btn-outline-warning openModalBtn" data-seller="{{ item.product.seller.id }}" data-seller-name="{{ item.product.seller.storename }}" data-review-id="{{ item.review_id }}" data-review-desc="{{ item.review_desc }}" type="button" >Edit Review</button>                                                
+                                    {% endif %}        
+                                {% else %}
+                                    <label class="badge badge-success">Not Allowed</label>
+                                {% endif %}
+                                
+
+
+                                </td>
+                            </tr>
+                            {% endfor %}
+                         
+                        </tbody>
+                    </table>
+                    <div class="overlay" id="overlay">
+                    <!-- Add this modal to your HTML template -->
+                    <div id="reviewModal" class="modal">
+                        <div class="modal-content" style="background-color:white;">
+                            <form id="reviewForm" method="post" action="{% url 'submit_review' %}">
+                                {% csrf_token %}
+                                <h2 id="modalTitle">Add Review</h2>
+                                
+                                <label for="description">Review:</label>
+                                <textarea name="description" id="description" rows="4" required></textarea>
+                                <input type="hidden" id="seller_id" name="seller_id" value="">
+                                <input type="hidden" id="review_id" name="review_id" value="">
+                                <button class="btn btn-inverse-success btn-fw" type="submit" id="submitBtn"  style="margin-top:40px;">Submit Review</button>
+                            </form>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        var reviewModal = $("#reviewModal");
+        var overlay = $("#overlay");
+        var modalContent = $(".modal-content"); // Select the modal content container
+        var modalTitle = $("#modalTitle");
+        var ratingInput = $("#rating");
+        var descriptionInput = $("#description");
+        var sellerIdInput = $("#seller_id");
+        var reviewIdInput = $("#review_id");
+        var submitBtn = $("#submitBtn");
+    
+        $(".openModalBtn").click(function() {
+            var sellerId = $(this).data("seller");
+            var sellerName = $(this).data("seller-name");
+            var reviewId = $(this).data("review-id");
+            var reviewDesc = $(this).data("review-desc"); 
+            
+            if (reviewId) {
+                modalTitle.text("Edit Review for " + sellerName);
+                submitBtn.text("Edit Review");
+                var rating = $(this).data("rating");
+                var description = $(this).data("description");
+                ratingInput.val(rating);
+                descriptionInput.val(reviewDesc);
+                reviewIdInput.val(reviewId);
+            } else {
+                modalTitle.text("Add Review for " + sellerName);
+                submitBtn.text("Submit Review");
+                ratingInput.val("");
+                descriptionInput.val("");
+                reviewIdInput.val("");
+            }
+    
+            sellerIdInput.val(sellerId);
+            reviewModal.css("display", "block");
+            overlay.css("display", "block");
+        });
+    
+        // Prevent closing the modal when clicking inside the modal content
+        modalContent.click(function(event) {
+            event.stopPropagation(); // Stop event propagation
+        });
+    
+        // Close the modal when the user clicks the close button
+        $("#reviewModal .close").click(function() {
+            closeModal();
+        });
+    
+        // Close the modal and overlay when the user clicks outside the modal
+        overlay.click(function() {
+            closeModal();
+        });
+    
+        // Submit the review form when it's submitted
+        $("#reviewForm").submit(function() {
+            // You can add validation or other logic here if needed
+            return true; // Allow the form to be submitted
+        });
+    
+        // Function to close the modal
+        function closeModal() {
+            reviewModal.css("display", "none");
+            overlay.css("display", "none");
+        }
+    });
+</script>
+
+{% endblock %}

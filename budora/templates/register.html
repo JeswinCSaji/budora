@@ -10,16 +10,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">    <title>Register</title>
     
 </head>
-<style>
-    #img1
-{
-    margin-left: 8360%;
-}
-span
-{
-    margin-left: 30px;
-}
-</style>
 <body>
     <nav class="Logo">
         <div class="container">
@@ -44,7 +34,7 @@ span
                 </div>
                     <form class="signup-form" style=" width:45%; "  method="post" >     
                         {% csrf_token %}        
-                            <input id="fn" class="signupelement" placeholder="Name" name="username" required>
+                            <input id="fn" class="signupelement" placeholder="Full Name" name="username" required>
                             <span id="fnspan" style="font-size: small;"></span> <br>                       
                             <input id="mail" class="signupelement" placeholder="Email" name="email" required>
                             <span id="emspan" style="font-size: small;"></span> <br>                                              

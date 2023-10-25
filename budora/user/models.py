@@ -12,7 +12,8 @@ class UserProfile(models.Model):
     profile_pic = models.ImageField(upload_to='profile_pics/', null=True, blank=True)
     # gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
     phone_number = models.CharField(max_length=20, null=True, blank=True)
-    address = models.TextField(blank=True, null=True)  
+    address = models.TextField(blank=True, null=True) 
+    reset_password = models.CharField(max_length=128, null=True, blank=True)  # New field for reset password 
 
     def __str__(self):
         return self.name
@@ -25,6 +26,13 @@ class Seller(models.Model):
     storename = models.CharField(max_length=100)
     contact = models.CharField(max_length=20, null=True, blank=True)
     address = models.TextField(blank=True, null=True)
+    landmark = models.TextField(blank=True, null=True)
+    
+    # New fields
+    opening_time = models.TimeField(null=True, blank=True)
+    closing_time = models.TimeField(null=True, blank=True)
+    opening_days = models.CharField(max_length=100, null=True, blank=True)
+    store_image = models.ImageField(upload_to='store_images/', null=True, blank=True)
 
     def str(self):
         return self.user.username
@@ -39,6 +47,15 @@ class Certification(models.Model):
         (REJECTED, 'Rejected'),
         (PENDING, 'Pending'),
     ]
+    DAY_CHOICES = [
+        ('monday', 'Monday'),
+        ('tuesday', 'Tuesday'),
+        ('wednesday', 'Wednesday'),
+        ('thursday', 'Thursday'),
+        ('friday', 'Friday'),
+        ('saturday', 'Saturday'),
+        ('sunday', 'Sunday'),
+    ]
     # seller = models.ForeignKey(Seller, on_delete=models.CASCADE, default=Seller)
 
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=1)
@@ -48,6 +65,10 @@ class Certification(models.Model):
     expiry_date_from = models.DateField()
     expiry_date_to = models.DateField()
     timestamp = models.DateTimeField(auto_now_add=True)
+    opening_time = models.TimeField(null=True, blank=True)
+    closing_time = models.TimeField(null=True, blank=True)
+    opening_days = models.CharField(max_length=100, choices=DAY_CHOICES, blank=True)  # Field with day choices
+    store_image = models.ImageField(upload_to='store_images/', null=True, blank=True)
     is_approved = models.CharField(
         max_length=10,
         choices=APPROVAL_CHOICES,
@@ -66,13 +87,12 @@ class Category(models.Model):
 
 class Product(models.Model):
     product_name = models.CharField(max_length=100)  # Product name selected by the seller
-    product_description = models.TextField()
     category = models.ForeignKey(Category, on_delete=models.CASCADE)  # Reference to the category
     product_price = models.DecimalField(max_digits=10, decimal_places=2)  # Product price inherited from the category
     product_image = models.ImageField(upload_to='category_images/', null=True, blank=True)
     product_stock = models.IntegerField(default=0, null=True, blank=True)  # Add the default value here
 
-    seller = models.ForeignKey(Seller, on_delete=models.CASCADE, default=1)
+    seller = models.ForeignKey(Seller, on_delete=models.CASCADE, related_name='products')
 
     
     def __str__(self):
@@ -85,12 +105,20 @@ class Product(models.Model):
         summary.update_total_stock()
         
 class ProductSummary(models.Model):
+    APPROVED = 'approved'
+    PENDING = 'pending'
+    
+    STOCK_APPROVAL_CHOICES = [
+        (APPROVED, 'Approved'),
+        (PENDING, 'Pending'),
+    ]
+
     product_name = models.CharField(max_length=100, unique=True)
     product_sci_name = models.CharField(max_length=100, blank=True, null=True)
     total_stock = models.IntegerField(default=0, null=True, blank=True)
     product_image = models.ImageField(upload_to='product_images/', blank=True, null=True)
     product_description = models.TextField(blank=True, null=True)
-    product_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, blank=True, null=True, related_name='product_summaries')
     
     # Additional fields
     light_requirements = models.CharField(max_length=100, blank=True, null=True)
@@ -99,7 +127,12 @@ class ProductSummary(models.Model):
     soil_type = models.CharField(max_length=100, blank=True, null=True)
     toxicity_information = models.TextField( blank=True, null=True)
     maintenance_instructions = models.TextField(blank=True, null=True)
-
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, blank=True, null=True,related_name='product_summary')
+    stock_is_approved = models.CharField(
+        max_length=20,
+        choices=STOCK_APPROVAL_CHOICES,
+        default=PENDING,
+    )
     def __str__(self):
         return self.product_name
 
@@ -135,3 +168,136 @@ class Wishlist(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Wishlist Item - {self.product.product_name}"
+    
+class Cart(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    seller = models.ForeignKey(Seller, on_delete=models.CASCADE, null=True)  # Assuming the seller is also a User
+    quantity = models.PositiveIntegerField(default=1)
+    date_added = models.DateTimeField(auto_now_add=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    image = models.ImageField(upload_to='cart_item_images/', blank=True, null=True)  # Add image field
+
+    def __str__(self):
+        return f"{self.user.username}'s Cart Item - {self.product.product_name}"
+
+    def save(self, *args, **kwargs):
+        # Calculate the price based on the product's price per kg and the quantity
+        self.price = self.product.product_price * self.quantity
+        super().save(*args, **kwargs)
+
+class BillingDetails(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # If you want to associate the billing details with a user
+    first_name = models.CharField(max_length=255)
+    last_name = models.CharField(max_length=255)
+    state = models.CharField(max_length=255)
+    street_address = models.CharField(max_length=255)
+    apartment_suite_unit = models.CharField(max_length=255, blank=True, null=True)  # Optional field
+    town_city = models.CharField(max_length=255)
+    postcode_zip = models.CharField(max_length=20)
+    phone = models.CharField(max_length=20)
+    email = models.EmailField()
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}'s Billing Details"
+    
+class Order(models.Model):
+    class PaymentStatusChoices(models.TextChoices):
+        PENDING = 'pending', 'Pending'
+        SUCCESSFUL = 'successful', 'Successful'
+        FAILED = 'failed', 'Failed'
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    products = models.ManyToManyField(Product)  # Assuming you have a Product model
+    seller = models.ForeignKey(Seller, on_delete=models.CASCADE, null=True)  # Assuming the seller is also a User
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    order_date = models.DateTimeField(auto_now_add=True)
+    razorpay_order_id = models.CharField(max_length=255, default=None, unique=True)
+
+    payment_status = models.CharField(
+        max_length=20, choices=PaymentStatusChoices.choices, default=PaymentStatusChoices.PENDING)
+    def _str_(self):
+        return self.user.username 
+        
+class OrderItem(models.Model):
+    APPROVED = 'approved'
+    PENDING = 'pending'
+    
+    SELLER_APPROVAL_CHOICES = [
+        (APPROVED, 'Approved'),
+        (PENDING, 'Pending'),
+    ]
+
+    COLLECTED = 'collected'
+    NOTCOLLECTED = 'notcollected'
+
+    CUSTOMER_APPROVAL_CHOICES = [
+        (COLLECTED, 'collected'),
+        (NOTCOLLECTED, 'notcollected'),
+    ]
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    seller = models.ForeignKey(Seller, on_delete=models.CASCADE)  # Assuming the seller is also a User
+    quantity = models.PositiveIntegerField()
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    total_price = models.DecimalField(max_digits=10, decimal_places=2)
+    seller_is_approved = models.CharField(
+        max_length=20,
+        choices=SELLER_APPROVAL_CHOICES,
+        default=PENDING,
+    )
+    customer_is_approved = models.CharField(
+        max_length=20,
+        choices=CUSTOMER_APPROVAL_CHOICES,
+        default=NOTCOLLECTED,
+    )
+
+    def save(self, *args, **kwargs):
+        # Calculate the total price for this order item based on quantity and price
+        self.total_price = self.quantity * self.price
+        super(OrderItem, self).save(*args, **kwargs)
+        
+        # Update the total order price in the associated Order model
+        order = self.order
+        order.total_order_price = sum(order_item.total_price for order_item in order.orderitem_set.all())
+        order.save()
+
+class Review(models.Model):
+    REVIEWED = 'reviewed'
+    PENDING = 'pending'
+    
+    REVIEW_CHOICES = [
+        (REVIEWED, 'reviewed'),
+        (PENDING, 'Pending'),
+    ]
+
+    review_id = models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    seller = models.ForeignKey(Seller, on_delete=models.CASCADE)
+    rating = models.IntegerField()
+    outof_rating = models.IntegerField(default=5, editable=False)
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    review_status = models.CharField(
+        max_length=20,
+        choices=REVIEW_CHOICES,
+        default=PENDING,
+    )
+
+
+    def _str_(self):
+        return f"Review by {self.user.username}"
+    
+class Recommend(models.Model):
+    s1 = models.CharField(max_length=200)
+    s2 = models.CharField(max_length=200)
+    s3 = models.CharField(max_length=200)
+    s4 = models.CharField(max_length=200)
+    s5 = models.CharField(max_length=200)
+    plant = models.CharField(max_length=200)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_on = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.plant

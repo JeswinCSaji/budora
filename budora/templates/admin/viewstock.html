@@ -1,60 +1,78 @@
 {% extends 'admin/base1.html' %}
 {% block content %}
 {% load static %}
-
-<link rel="stylesheet" href="{% static 'css/viewproducts.css' %}">
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<div class="container-fluid"class="card-title mb-4" style="padding-bottom:5%;">
-    <h5 id="regtitle">Product Stock</h5>
-    <div class="card" style="border-style: none; box-shadow: black 0px 20px 30px -10px;">
-        <div class="card-body">
-            <div id="indiv">
-                <label for="role-filter" class="filter-label">Filter by Fill:</label>
-                <select id="role-filter" class="filter-select">
-                  <option value="all">All</option>
-                  <option value="none">Not Filled</option>
-                </select>
-                <br>
-                <br>
-                <!-- Search form -->
-                <form  class="search-form" id="searchform">
-                  <label for="username" class="search-label">Search by Plant Name:</label>
-                  <input type="text" id="username" name="username" class="search-input">
-                  <button type="submit" class="search-button">Search</button>
-                </form>
-                <br>
-                <br>
-              </div>
-              <p id="no-user-message" style="display: none;">No such Plant</p>
           <div class="container mt-4">
-    <table class="user-list">
+            <div class="col-lg-12 grid-margin stretch-card">
+              <div class="card">
+                <div class="card-body">
+                      <h4 class="card-title">View Stock</h4>
+                      <p class="card-description">
+                        <div class="col-md-9">
+                        <div class="form-group row">
+                        <label for="role-filter" class="filter-label col-sm-3 col-form-label">Filter by status:</label>
+                        <div class="col-sm-9">
+                          <select id="role-filter" class="filter-select form-control">
+                            <option value="all">All</option>
+                            <option value="approved">Approved</option>
+                            <option value="reject">Pending</option>
+                          </select>
+                        </div>
+                        </div>
+                    </p>
+                </div>
+                    <!-- Search form -->
+                    <form class="search-form" id="searchform">
+                      <input type="text" id="username" name="username" class="search-input form-control" placeholder="Search by Plantname">
+                  </form>
+                  </div>
+                  <p id="no-user-message" style="display: none;">No such Plant</p>
+                  <div class="table-responsive">
+    <table class="user-list table table-hover">
         <thead>
             <tr>
                 <th style="font-weight: bold;">Plant Name</th>
-                <th style="font-weight: bold;">Total Stock</th>
-                <th style="font-weight: bold;">Plant Description</th>
-                <th style="font-weight: bold;">Plant Price</th>
+                <th style="font-weight: bold;">Scientific Name</th>
+                <th style="font-weight: bold;">Category</th>
                 <th style="font-weight: bold;">Plant Image</th>
+                <th style="font-weight: bold;">Total Stock</th>
                 <th style="font-weight: bold;">Action</th>  <!-- Add this column -->
+                <th style="font-weight: bold;">Status</th>
+
             </tr>
         </thead>
         <tbody>
             {% for summary in product_summaries %}
                 <tr>
                     <td>{{ summary.product_name }}</td>
-                    <td>{{ summary.total_stock }}</td>
-                    <td>{{ summary.product_description }}</td>
-                    <td>{{ summary.product_price }}</td>
-                    <td>
-                        {% if summary.product_image %}
-                            <img src="{{ summary.product_image.url }}" alt="{{ summary.product_name }}" width="100">
+                    <td>{{ summary.product_sci_name }}</td>
+                    <td>{{ summary.category.category_name }}</td>
+                    <td>{% if summary.product_image %}
+                          <img src="{{ summary.product_image.url }}" alt="{{ summary.product_name }}" width="100">
                         {% else %}
-                            No image available
+                           No image available
                         {% endif %}
                     </td>
+                    
+                    {% if summary.total_stock > 10 %}
+                      <td>{{ summary.total_stock }}</td>                                    
+                    {% else %}
+                      <td class="text-danger" >{{ summary.total_stock }}</td> 
+                    {% endif %}
+                  
                     <td>
-                        <a href="{% url 'edit_product_stock' summary.pk %}" class="btn btn-sm btn-primary">Edit</a><br>
+                        <a href="{% url 'edit_product_stock' summary.pk %}" class="btn btn-inverse-info btn-fw">Edit</a><br>
+                    </td>
+                    <td>
+                    {% if summary.stock_is_approved == 'pending' %}
+                        <form method="post" action="{% url 'stock_approve' summary.id %}">
+                        {% csrf_token %}
+                        <p style="display:none;">reject</p>
+                        <button class="btn btn-inverse-success btn-fw" type="submit" id="approvestock" >Approve</button>
+                        </form>
+                    {% else %}
+                        <label class="badge badge-success">Approved</label>
+                    {% endif %}
                     </td>
                 </tr>
             {% endfor %}
@@ -81,7 +99,7 @@
   
         rows.forEach(function (row) {
           const username = row.querySelector('td:nth-child(1)').textContent.toLowerCase();
-          const role = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+          const role = row.querySelector('td:nth-child(7)').textContent.toLowerCase();
   
           // Check if the user matches the selected role (or if all roles are selected)
           if ((selectedRole === 'all' || role.includes(selectedRole)) &&

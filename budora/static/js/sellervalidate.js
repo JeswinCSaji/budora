@@ -15,8 +15,12 @@ $(document).ready(function () {
         validateContact("#contact");
     });
 
-    $("#address").keyup(function () {
+    $("#address").keyup(function () { 
         validateAddress("#address");
+    });
+
+    $("#landmark").keyup(function () { 
+        validateLandmark("#landmark");
     });
 
     $("#pass").keyup(function () {
@@ -66,16 +70,24 @@ function validateEmail(fieldId) {
 
 function validatePassword(fieldId) {
     var password = $(fieldId).val();
-    var pwd_expression = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
-
-    if (password === "") {
-        $("#pspan").html("Enter your password").css("color", "red");
-    } else if (!pwd_expression.test(password)) {
-        $("#pspan").html("Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one digit, and one special character").css("color", "red");
-    } else {
-        $("#pspan").html("");
-    }
-}
+    var pattern = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
+    if (!pattern.test(password)) {
+        if (password.length < 8) {
+            $("#pspan").html("At least 8 characters").css("color", "red");
+        }
+        if (!/[0-9]/.test(password)) {
+            $("#pspan").html("At least 1 number").css("color", "red");
+        }
+        if (!/[!@#$%^&*]/.test(password)) {
+            $("#pspan").html("At least 1 symbol (!@#$%^&*)").css("color", "red");
+            }
+        if (!/[A-Z]/.test(password)) {
+            $("#pspan").html("At least 1 capital letter").css("color", "red");
+        }
+        $("#pspan").html("Invalid password").css("color", "red");
+        }
+        $("#pspan").html("").css("color", "red");
+        }
 
 
 function validateConfirmPassword(fieldId) {
@@ -110,3 +122,13 @@ function validateAddress(fieldId) {
         $("#adspan").html("");
     }
 }
+
+function validateLandmark(fieldId) {
+    var con = $(fieldId).val();
+    if (con === "") {
+        $("#ldspan").html("Enter a Landmark").css("color", "red");
+    } else {
+        $("#ldspan").html("");
+    }ldspan
+}
+

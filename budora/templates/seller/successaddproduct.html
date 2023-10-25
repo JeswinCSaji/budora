@@ -14,21 +14,16 @@
 </head>
 <body>
   {% block content %}
+  <div class="container-fluid" >
+    <div class="card"style="border-style: none; box-shadow: black 0px 20px 30px -10px; background-color:white;">
+      <div class="card-body" >
+    <h2>Plant Added</h2>
+    <p>Your Plant has been added successfully.</p>
+      <a href="{% url 'viewaddproduct' %}" class="btn btn-danger">View Plants</a></p>
 
-  <div class="container mt-4"  style="border-style: none; box-shadow: black 0px 20px 30px -10px; background-color:white;padding-top:20px; padding-bottom:20px;">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <!-- Session info and logout link -->
-      <div>
-        <p>Your Plant is Added</p>
-      </div>
-      
-    </div>
-    <h2>Added your Plant to the Plant Category </h2>
-    <div>
-      <p><a href="{% url 'viewaddproduct' %}" class="btn btn-danger">View Plants</a></p>
-    </div>
   </div>
-  
+</div>
+</div>
   {% endblock %}
 
 </body>

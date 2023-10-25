@@ -1,56 +1,40 @@
 {% extends 'admin/base1.html' %}
-<html>
-<head>
-    <title>Delete Category</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        /* Customize styles here */
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .btn-danger {
-            margin-right: 10px;
-        }
-    </style>
-</head>
-<body>
     {% block content %}
-
-    <div class="container mt-4" style="border-style: none; box-shadow: black 0px 20px 30px -10px; background-color:white;padding-top:20px; padding-bottom:20px;">
-        <h5 class="fw-bold">Confirm Category Deletion</h5>
-        <p>Are you sure you want to delete the category "{{ category.category_name }}"?</p>
-        {% if associated_products %}
-            <p class="confirmation-message">The following products are associated with this category:</p>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>Product Name</th>
-                        <th>Seller Name</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for product in associated_products %}
+    <div class="col-12 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Confirm Category Deletion</h4>
+            <h2>Are you sure you want to delete the category "{{ category.category_name }}"?</h2>
+                {% if associated_products %}
+                <p class="confirmation-message">The following products are associated with this category:</p>
+                <table class="table table-hover">
+                    <thead>
                         <tr>
-                            <td>{{ product.product_name }}</td>
-                            <td>{{ product.seller.user.username }}</td>
+                            <th>Product Name</th>
+                            <th>Seller Name</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-            <p class="confirmation-message">Deleting this category will also delete these associated products. Proceed with caution.</p>
-        {% endif %}
-        <form method="post">
-            {% csrf_token %}
-            <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-            <a href="{% url 'viewcategory' %}" class="btn btn-primary btn-sm">Cancel</a>
-        </form> 
-    </div>
-    {% endblock %}
+                    </thead>
+                    <tbody>
+                        {% for product in associated_products %}
+                            <tr>
+                                <td>{{ product.product_name }}</td>
+                                <td>{{ product.seller.user.username }}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <p class="confirmation-message">Deleting this category will also delete these associated products. Proceed with caution.</p>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                <a href="{% url 'viewcategory' %}" class="btn btn-dark">Cancel</a>
+            </form> 
+        </div>
+        </div>
+      </div>
+      {% endblock %}
+        
 
 </body>
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

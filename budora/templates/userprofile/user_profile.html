@@ -98,12 +98,13 @@
 
 
     {% else  %}
+    <link href="{% static 'css/style.css' %}" rel="stylesheet">
     <div class="container-fluid sticky-top">
         <div class="container">
         <nav class="navbar navbar-expand-lg navbar-light py-2 py-lg-2 ">
             <a href="index.html" class="navbar-brand animated rubberBand" id="budoralogo" >
                 <img class="img-fluid" src="{% static 'images/8.png' %}" alt="Logo">
-                <a id="logoname" class="animated rubberBand"  href="#">BUDORA </a>
+                <a id="logoname" class="animated rubberBand" style="margin-left:-20px; " href="#">BUDORA </a>
             </a>
             <button type="button" class="navbar-toggler ms-auto me-0" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
                 <span class="navbar-toggler-icon"></span>
@@ -111,6 +112,21 @@
             <div class="collapse navbar-collapse " id="navbarCollapse" data-wow-delay="0.1s" >
                 <div class="navbar-nav ms-auto" style="text-decoration: none;
                 text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px;">
+                <form class="nav-item nav-link text animated zoomIn" style="font-weight: lighter;margin-top:-6px;" id="search-form">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="search-input" placeholder="Search for products">
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-primary" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <ul id="search-results" class="list-group" style="position: absolute; width: 100%; display: none;">
+                        <!-- Search results will be populated here as list items -->
+                    </ul>
+                                                             
+                </form>
                     <a href="{% url 'index' %}" class="nav-item nav-link active text animated zoomIn" style="font-weight: lighter;">Home</a>
                     <a href="{% url 'store' %}" class="nav-item nav-link animated zoomIn" style="font-weight: lighter;">Store</a>
                     {% comment %} <a href="#" class="nav-item nav-link text animated pulse" style="font-weight: lighter;">Rental</a>
@@ -118,7 +134,8 @@
         
                     {% if user.is_authenticated %}
         
-                    
+                    <a href="{% url 'cart' %}" class="nav-item nav-link text animated zoomIn" style="font-weight: lighter;"><i class="fas fa-shopping-cart"></i></a>
+                    <a href="{% url 'wishlist' %}" class="nav-item nav-link text animated zoomIn" style="font-weight: lighter;"><i class="fa fa-heart"></i></a>               
                     <div class="nav-item dropdown">
                         {% if user.userprofile.profile_pic %}
                         <img src="{{ user.userprofile.profile_pic.url }}" alt="" width="30" height="30" style="box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px; margin-top:20px;" class="rounded-circle animated zoomIn">
@@ -128,6 +145,7 @@
                         <div class="dropdown-menu bg-light rounded-0 m-0">
                             <p class="dropdown-item">{{ user.userprofile.name }}</p>
                             <a href="{% url 'profile' %}" class="dropdown-item">Profile</a>
+                            <a href="{% url 'orders' %}" class="dropdown-item">Orders</a>
                             <a href="{% url 'loggout' %}" class="dropdown-item">Logout</a>
                         </div>
                     </div>
@@ -136,11 +154,6 @@
                     {% endif %}
                     
                 </div>
-                {% if user.is_authenticated %}
-                <div class=" ps-4 d-none d-lg-block">
-                    <a class="btn btn-dark rounded-pill m-2 animated zoomIn" style="padding-top:7px; height:30px; width:30px;  box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px; margin-top:20px;" href="{% url 'wishlist' %}"><i style="margin-left:-5px; " class="fa fa-heart"></i></a>
-                </div>
-                {% endif %}
                     
                 </div>
  
@@ -149,15 +162,7 @@
         </div>
         </div>
     {% endif  %}
-    {% if messages %}
-    <div class="error-message" style=" border-style:groove; border-color:red; border-width: 2px; box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px;  height:35px; width:180px;margin-left:20px;margin-left: 5%; margin-top:-20px; ">
-        <p style="color: red; margin-left: 20px; margin-top:5px; font-size:larger;">
-            {% for message in messages %}
-            Profile Updated
-            {% endfor %}
-                 </p>
-            </div>
-            {% endif %}
+    
     <form method="post" enctype="multipart/form-data" >
         {% csrf_token %}
         <div id="divout" >
@@ -254,8 +259,20 @@
                         {% endif  %}
                         
                     </div>
-                    <button class=" text animated zoomIn" type="submit" id="signinbtn" >Update</button>
-                    
+                    <div>
+                        <label for="address" id="carde" class="form-label text animated zoomIn">Reset Password:</label>
+                        <hr class=" text animated zoomIn" id="signintext2">
+                        <input type="Password" class="form-control text animated zoomIn"  id="cardelement" name="old_password" placeholder="current password">
+                        <input type="Password" class="form-control text animated zoomIn"  id="cardelement" name="reset_password" style="margin-top:20px;" placeholder="new password">
+                        <input type="Password" class="form-control text animated zoomIn"  id="cardelement" name="cpass" style="margin-top:20px;" placeholder="confirm new password">
+                        <span id="pspan" class="text-danger" style="margin-left:50%;"></span>
+                    </div>
+                    <button class=" text animated zoomIn" type="submit" id="signinbtn">Update</button>
+                    {% if messages %}
+                            {% for message in messages %}
+                                <p class="text-danger" style="margin-left:">{{ message }}</p>
+                            {% endfor %}
+                        {% endif %}
                 </div>
     </form>
     </div>
@@ -281,6 +298,13 @@
       $("input[name='address']").keyup(function () {
         validateAddress("input[name='address']");
       });
+      $("input[name='reset_password']").keyup(function () {
+        validatePassword("input[name='reset_password']");
+    });
+
+    $("input[name='cpass']").keyup(function () {
+        validateConfirmPassword("input[name='cpass']");
+    });
   });  
       function validateProfileImage(fieldSelector) {
         var certificationImage = $(fieldSelector).val().trim();
@@ -329,10 +353,99 @@
         }
     }   
       // Add other validations if needed
-  
+      function validatePassword() {
+        var oldpassword = $("input[name='old_password']").val().trim();
+        var password = $("input[name='reset_password']").val().trim();
+        var pattern = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/;
+        var valid = true;
+    
+        if (password === oldpassword) {
+            $("#pspan").html("cannot be the same as the old password").css("color", "red");
+            valid = false;
+        } else if (password.length < 8) {
+            $("#pspan").html("At least 8 characters").css("color", "red");
+            valid = false;
+        } else if (!/[0-9]/.test(password)) {
+            $("#pspan").html("At least 1 number").css("color", "red");
+            valid = false;
+        } else if (!/[!@#$%^&*]/.test(password)) {
+            $("#pspan").html("At least 1 symbol (!@#$%^&*)").css("color", "red");
+            valid = false;
+        } else if (!/[A-Z]/.test(password)) {
+            $("#pspan").html("At least 1 capital letter").css("color", "red");
+            valid = false;
+        } else if (!pattern.test(password)) {
+            $("#pspan").html("Invalid password").css("color", "red");
+            valid = false;
+        }
+    
+        if (valid) {
+            $("#pspan").html("").css("color", "red");
+        }
+    }
+    
+
+    function validateConfirmPassword() {
+        var password = $("input[name='reset_password']").val();
+        var confirmPassword = $("input[name='cpass']").val().trim();
+
+        if (confirmPassword === "") {
+            $("#pspan").html("Enter the password").css("color", "red");
+        } else if (confirmPassword !== password) {
+            $("#pspan").html("Passwords do not match").css("color", "red");
+        } else {
+            $("#pspan").html("");
+        }
+    }
+
     
   
   </script>
+    <script>
+        $(document).ready(function () {
+            $('#search-input').keyup(function () {
+                var query = $(this).val();
+                $.ajax({
+                    type: 'GET',
+                    url: '/live_search/',
+                    data: {
+                        'query': query
+                    },
+                    success: function (data) {
+                        var results = data.products;
+                        var resultsHtml = '';
+                        resultsHtml += '<ul class="list-group">'; // Start the list
+                            if (results.length === 0) {
+                                resultsHtml += '<li class="list-group-item">No products found</li>';
+                            } else {
+                                for (var i = 0; i < results.length; i++) {
+                                    var prod_id = results[i].prod_id;
+                                    resultsHtml += '<li class="list-group-item" style="background-color:black;"><a href="/product_single/' + prod_id + '">' + results[i].name + '</a></li>';
+                                }
+                            }
+                            resultsHtml += '</ul>'; // End the list
+        
+                        if (query) {
+                            $('#search-results').html(resultsHtml);
+                            $('#search-results').show();
+                        } else {
+                            $('#search-results').hide();
+                        }
+        
+                        // Handle click events on the links with data-prod-id attribute
+                        $('.text-truncate[data-prod-id]').on('click', function (e) {
+                            e.preventDefault();
+                            var prodId = $(this).data('prod-id');
+                            // Construct the URL using JavaScript and navigate to it
+                            var url = '/product_single/' + prodId + '/';
+                            window.location.href = url;
+                        });
+                    }
+                });
+            });
+        });
+        
+    </script>
 </body>
 
 

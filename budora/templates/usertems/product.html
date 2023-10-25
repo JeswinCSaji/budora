@@ -1,18 +1,5 @@
 {% extends 'usertems/base.html' %}
 {% load static %}
-
-  <html lang="en">
-
-<head>
-    <meta charset="utf-8">
-    <title>Tea House - Tea Shop Website Template</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="" name="keywords">
-    <meta content="" name="description">
-
-</head>
-
-<body>
 {% block content %}
 
     <!-- Favicon -->
@@ -104,8 +91,7 @@
                             <div class="d-flex align-items-center">
                                 {% if user.is_authenticated %}
 
-                                        <form method="post">
-                                            {% csrf_token %}
+                                      
                                             {% if is_in_wishlist %}
                                             <form method="post" action="{% url 'remove_productwishlist' product.id %}">
                                                 {% csrf_token %}
@@ -117,11 +103,11 @@
                                                 <button class="btn btn-dark rounded-pill py-2 px-4 m-2" style="text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px;" type="submit"><i class="bi bi-heart"></i> Add to Wishlist</button>
                                             </form>
                                             {% endif %}
-                                        </form>
+                                  
 
                                 {% endif %}
-                                <form method="post">
-                                    <button class="btn btn-dark rounded-pill py-2 px-4 m-2" style="text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px; margin-top:-30px;" type="submit">Stores <i style="margin-left:10px;" class="fa fa-arrow-right"></i></button>
+                                <form >
+                                    <a class="btn btn-dark rounded-pill py-2 px-4 m-2" style="text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px; margin-top:-30px;" href="#stores" >Stores <i style="margin-left:10px;" class="fa fa-arrow-right"></i></a>
                                 </form>
                             </div>
                         </div>
@@ -138,49 +124,77 @@
         </div>
     </div>
         <!-- Store Start -->
-        <div class="container-xxl py-5">
-            <div class="container">
-                <div class="section-title text-center mx-auto wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
-                    <p class="fs-5 fw-medium fst-italic text-primary">Stores</p>
-                    <h4 class="display-8">Find the perfect store to your liking</h4>
-                </div>
-                <div class="row g-4">
-                    {% comment %} {% for product_summary in product_summaries %} {% endcomment %}
-                    <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
-                        <div class="store-item position-relative text-center">
-                            {% if product.product_image %}
-                            <img src="{{ product.product_name }}" alt="{{ product.product_name }}"  class="img-fluid" style="height: 400px;">                      
+        <div class="container-xxl py-5" id="stores">
+            <div class="section-title text-center mx-auto wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
+                <p class="fs-5 fw-medium fst-italic text-primary">Stores</p>
+                <h4 class="display-8">Find the perfect store to your liking</h4>
+            </div>
+            <div class="row g-4">
+                {% for seller in sellers_with_product %}
+                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                    <div class="store-item position-relative text-center">
+                       {% comment %} {% if product.product_image %} {% endcomment %}
+                        <img src="{% static "images/54.jpeg" %}" alt="{{ seller.storename }}"  class="img-fluid" style="height:200px;">                      
+                        {% comment %} {% else %}
+                        <img src="{% static 'images/noim2.png' %}" alt="No Image"  class="img-fluid" style="height: 400px;">                      
+                        {% endif %} {% endcomment %}
+                        <div class="p-4">
+                            <h5 class="mb-3 text-primary">{{ seller.storename }}</h5>
+                            <div class="text-center mb-3">
+                                {% comment %} {% for review in allreviews %}
+                                {% with avg_rating_rounded=avg_rating|default:0|floatformat:"0" %}
+                                    {% for i in "12345" %}
+                                        {% if i <= avg_rating_rounded %}
+                                            <small class="fa fa-star text-primary" ></small>
+                                        {% else %}
+                                            <small class="fa fa-star text-light" ></small>
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endwith %}
+                                {% endfor %} {% endcomment %}
+                            </div>
+                            <p class="mb-3"><i class="bi bi-telephone text-primary" style="margin-right:10px;"></i>{{ seller.contact }}</p>
+                            <p class="mb-3"><i class="bi bi-geo text-primary" style="margin-right:10px;"></i>{{ seller.address }}</p>
+                        </div>
+                        <div class="store-overlay">
+                            {% for i in product_details %}
+                            {% if i.seller.storename == seller.storename %}
+                            
+                        <p style="text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px;  background-color:#88B44E; padding-top:12px;padding-bottom:12px;width:120px;border-radius:30px;"><i class="bi bi-tree" style="color:white;">{{ i.product_stock }}</i></p>
+                        <p style="text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px;  background-color:#88B44E; padding-top:12px;padding-bottom:12px;width:120px;border-radius:30px;"><i style="color:white;">Price : {{ i.product_price }}</i> </p>
+                    {% comment %} id=i.pk     {% endcomment %}
+                    
+                                            
+                        <a href="{% url 'seller_detail' seller.id i.pk%}" class="btn rounded-pill py-2 px-4 m-2" id="anybtn">More Details<i class="fa fa-arrow-right ms-2"></i></a>
+                        {% endif %}  
+                        {% endfor %}
+                            {% comment %} <a href="" class="btn btn-dark rounded-pill py-2 px-4 m-2">Add to Cart <i class="fa fa-cart-plus ms-2"></i></a> {% endcomment %}
+                                                    {% comment %} {% if product_summary.product_summaries.total_stock > 0 %}
+                            <p>Stock Left</p>
+                            <h4 class="text-primary">{{ product.total_stock }}</h4>
                             {% else %}
-                            <img src="{% static 'images/noim2.png' %}" alt="No Image"  class="img-fluid" style="height: 400px;">                      
-                            {% endif %}
-                            <div class="p-4">
-                                {% comment %} <div class="text-center mb-3">
-                                    <small class="fa fa-star text-primary"></small>
-                                    <small class="fa fa-star text-primary"></small>
-                                    <small class="fa fa-star text-primary"></small>
-                                    <small class="fa fa-star text-primary"></small>
-                                    <small class="fa fa-star text-primary"></small>
-                                </div> {% endcomment %}
-                                <h4 class="mb-3">{{ product.product_name }}</h4>
-                                {% if product_summary.product_summaries.total_stock > 0 %}
-                                <p>Stock Left</p>
-                                <h4 class="text-primary">{{ product.total_stock }}</h4>
-                                {% else %}
-                                <p>_ _ _ _</p>
-                                <h4 class="text" style="color:red;">OUT OF STOCK</h4>
-                                {% endif %}
-                            </div>
-                            <div class="store-overlay">
-                            {% if user.is_authenticated %}
-                            <a href="" class="btn btn-primary rounded-pill py-2 px-4 m-2">More Detail<i class="fa fa-arrow-right ms-2"></i></a>
-                            {% endif %}  
-                                {% comment %} <a href="" class="btn btn-dark rounded-pill py-2 px-4 m-2">Add to Cart <i class="fa fa-cart-plus ms-2"></i></a> {% endcomment %}
-                            </div>
+                            <p>_ _ _ _</p>
+                            <h4 class="text" style="color:red;">OUT OF STOCK</h4>
+                            {% endif %} {% endcomment %}
                         </div>
                     </div>
-                    {% comment %} {% endfor %} {% endcomment %}
                 </div>
+                {% endfor %}
             </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
         </div>
         <!-- Store End -->
     <!-- Back to Top -->
@@ -202,3 +216,4 @@
 </body>
 
 </html>
+

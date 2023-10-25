@@ -50,7 +50,8 @@
 
 .btn-primary,
 .btn-outline-primary:hover {
-    color: var(--light);
+    background-color: white;
+    color: #88B44E;
 }
 
 .btn-secondary,
@@ -135,7 +136,43 @@
                     text-decoration: none;
                     text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px;
                 font-size: larger;
+
 }
+#anybtn
+{
+    
+    border-radius: 100px;
+    color: #9abf69;
+    background-color: white;
+    border-width: 1px;
+    border-style: groove;
+    border-color: #9abf69;
+    fill: #9abf69;
+    transition: 0.5s;
+    /* width: 150px;
+    height: 40px; */
+    
+}
+#anybtn:focus {
+    
+  color: white;
+  border-style: none;
+  background-color: #9abf69;
+    
+  }
+  
+  #anybtn:hover {
+    
+    color: white;
+    border-style: none;
+    background-color: #9abf69;
+  }
+  #anybtn:active {
+   
+    color: white;
+    border-style: none;
+    background-color: #9abf69;
+  }
 #homebtn
 {
     
@@ -199,6 +236,7 @@
     #logoname
     {
         font-size: medium;
+        margin-top:0px;
     }
 }
 

@@ -46,16 +46,18 @@
     <!-- Store Start -->
     <div class="container-xxl py-5">
         <div class="container">
-            <div class="section-title text-center mx-auto wow fadeInUp" data-wow-delay="0.1s" style="max-width: 500px;">
-                <p class="fs-5 fw-medium fst-italic text-primary">Indoor Plants</p>
-                <h1 class="display-6">Find the perfect complement to your room</h1>
+            <div class="section-title text-center mx-auto wow fadeInUp" data-wow-delay="0.1s">
+                <p class="fs-5 fw-medium fst-italic text-primary">Explore Our Exclusive Plant Collection</p>
+                <h2 class="display-8">Your Perfect Green Companions Await</h2>
             </div>
+                        
             <div class="row g-4">
                 {% for product_summary in product_summaries %}
-                <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
+                {% if product_summary.product_summaries.stock_is_approved == 'approved'%}
+                <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="0.1s">
                     <div class="store-item position-relative text-center">
                         {% if product_summary.product_summaries.product_image %}
-                        <img src="{{ product_summary.product_summaries.product_image.url }}" alt="{{ product_summary.product_summaries.product_name }}"  class="img-fluid" style="height: 400px;">                      
+                        <img src="{{ product_summary.product_summaries.product_image.url }}" alt="{{ product_summary.product_summaries.product_name }}"  class="img-fluid" style="height: 250px;">                      
                         {% else %}
                         <img src="{% static 'images/noim2.png' %}" alt="No Image"  class="img-fluid" style="height: 400px;">                      
                         {% endif %}
@@ -67,33 +69,34 @@
                                 <small class="fa fa-star text-primary"></small>
                                 <small class="fa fa-star text-primary"></small>
                             </div> {% endcomment %}
-                            <h4 class="mb-3">{{ product_summary.product_summaries.product_name }}</h4>
+                            <h4 class="mb-1">{{ product_summary.product_summaries.product_name }}</h4>
                             {% if product_summary.product_summaries.total_stock > 0 %}
                             <p>Stock Left</p>
-                            <h4 class="text-primary">{{ product_summary.product_summaries.total_stock }}</h4>
+                            <h5 class="text-primary">{{ product_summary.product_summaries.total_stock }}</h5>
                             {% else %}
                             <p>_ _ _ _</p>
                             <h4 class="text" style="color:red;">OUT OF STOCK</h4>
                             {% endif %}
                         </div>
                         <div class="store-overlay">
-                            <a href="{% url 'product_single' product_summary.product_summaries.id %}" class="btn btn-primary rounded-pill py-2 px-4 m-2">More Detail<i class="fa fa-arrow-right ms-2"></i></a>
-                        {% if user.is_authenticated %}
-
-
-                        <form method="post" style="margin-top:20px; ">
-                            {% csrf_token %}
+                            <a href="{% url 'product_single' product_summary.product_summaries.id %}" class="rounded-pill py-2 px-4 m-2" id="anybtn">More Details<i class="fa fa-arrow-right ms-2"></i></a>
+                        {% comment %} {% if user.is_authenticated %}                                     
                             {% if product_summary.in_wishlist %}
-                                <p style="text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px; background-color:#88B44E; padding-top:12px;padding-bottom:12px;width:70px;border-radius:180px;" ><i class="bi bi-heart-fill" style="color:white;"></i></p>
+                            <form method="post" action="{% url 'remove_productwishlist' product_summary.product_summaries.id %}">
+                                {% csrf_token %}
+                                <button style="text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px; background-color:#88B44E; padding-top:7px;padding-bottom:7px;width:50px;border-radius:180px;border-style:none;" type="submit"><i class="bi bi-heart-fill" style="color:white;"></i></button>
+                            </form>
                             {% else %}
-                                <p style="text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px;  background-color:#88B44E; padding-top:12px;padding-bottom:12px;width:70px;border-radius:180px;"><i class="bi bi-heart" style="color:white;"></i></p>
+                            <form method="post" action="{% url 'add_productwishlist' product_summary.product_summaries.id %}">
+                                {% csrf_token %}
+                                <button  style="text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px;  background-color:#88B44E; padding-top:7px;padding-bottom:7px;width:50px;border-radius:180px;border-style:none;" type="submit"><i class="bi bi-heart" style="color:white;"></i></button>
+                            </form>
                             {% endif %}
-                        </form>
-                        {% endif %}  
-                            {% comment %} <a href="" class="btn btn-dark rounded-pill py-2 px-4 m-2">Add to Cart <i class="fa fa-cart-plus ms-2"></i></a> {% endcomment %}
+                        {% endif %} {% endcomment %}
                         </div>
                     </div>
                 </div>
+                {% endif %}
                 {% endfor %}
             </div>
         </div>

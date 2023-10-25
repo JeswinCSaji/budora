@@ -24,22 +24,97 @@
     <!--  Main wrapper -->
     <div class="body-wrapper" >
       <div class="container-fluid" >
-        <div class="card" style="border-style: none; box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px; ">
+        <div class="card" style="border-style: none; box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px; background-color:white;">
           <div class="card-body">
-            <h5 class="card-title fw-semibold mb-4">Store Licence Approval</h5>
+           
           {% if existing_certification %}
 
             {% if existing_certification.is_approved == 'pending' %}
+            <h5 class="card-title text-dark fw-semibold mb-4">Store Licence Approval</h5>
             <p class="certification-message">You have already entered your Licence details.</p>
 
             {% elif existing_certification.is_approved == 'approved' %}
-            <p class="certification-message">Your Application is approved.</p>
+            <h5 class="card-title text-dark fw-semibold mb-4">Reviews for {{ existing_certification.store_name }}</h5>
+            <div class="col-md-12 col-xl-12 grid-margin stretch-card">
+              <div class="card-light col-md-12 col-xl-12">
+                <div class="card-body">
+                  <div class="d-flex flex-row justify-content-between">
+                    <h4 class="card-title text-dark"> Overall Rating -
+                        {% with avg_rating_rounded=avg_rating|default:0|floatformat:"0" %}
+                        {% for i in "12345" %}
+                            {% if i <= avg_rating_rounded %}
+                                <small class="fa fa-star text-dark" ></small>
+                            {% else %}
+                                <small class="fa fa-star text-light" ></small>
+                            {% endif %}
+                        {% endfor %}
+                        {% endwith %}
+                    </h4>
+                    {% comment %} <p class="text-muted mb-1 small">View all</p> {% endcomment %}
+                  </div>
+                  {% for review in allreviews %}
+                  <div class="preview-list">
+                    <div class="preview-item border-bottom">
+                      <div class="preview-thumbnail">
+                        {% with review_rating=review.rating|stringformat:"d"|default:0 %}
+                        {% if review.user.userprofile.profile_pic %}
+                        <img src="{{ review.user.userprofile.profile_pic.url }}" alt="image" class="rounded-circle" />
+                        {% else %}
+                        <img src="{% static 'images/usericon.png' %}" alt="image" class="rounded-circle" />
+                        {% endif %}
+                      </div>
+                      <div class="preview-item-content d-flex flex-grow">
+                        <div class="flex-grow">
+                          <div class="d-flex d-md-block d-xl-flex justify-content-between">
+                            <h6 class="preview-subject">{{ review.user.userprofile.name }}</h6>
+                            <p class="text-muted text-small">
+                              {% for i in "12345" %}
+                              {% if i <= review_rating %}
+                                  <small class="fa fa-star text-primary" ></small>
+                              {% else %}
+                                  <small class="fa fa-star text-light" ></small>
+                              {% endif %}
+                              
+                              {% endfor %}
+                              
+                            </p>
+                          </div>
+                          <p class="text-muted">{{ review.description }}</p>
+                          {% endwith %}
+                        </div>
+                      </div>
+                    </div>
+                    
+                  {% empty %}
+                      <div class="preview-item border-bottom">
+                        <div class="preview-thumbnail">
+                        </div>
+                        <div class="preview-item-content d-flex flex-grow">
+                          <div class="flex-grow">
+                            <div class="d-flex d-md-block d-xl-flex justify-content-between">
+                              <h6 class="preview-subject">No reviews available</h6>
+                              
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          
+             
+
+
             {% elif existing_certification.is_approved == 'rejected' %}
+            <h5 class="card-title text-dark fw-semibold mb-4">Store Licence Approval</h5>
             <p class="certification-message">Your Application is rejected.</p>
             {% else %}
               <p> Not working </p>                
             {% endif %}
           {% else %}
+          <h5 class="card-title text-dark fw-semibold mb-4">Store Licence Approval</h5>
             <!-- Display the certification form -->
             <form method="post" enctype="multipart/form-data" >
               {% csrf_token %}
@@ -51,7 +126,7 @@
               </div>
               <div class="form-group mb-3" style="margin-top: 10px;">
                 <label for="owner_name">Owner Name:</label>
-                <input type="text" id="owner_name" name="owner_name" class="form-control" value="{{ user.userprofile.name }}" readonly>
+                <input type="text" id="owner_name" name="owner_name" class="form-control" value="{{ user.seller.name }}" readonly>
                 <span id="owner_name_error" class="text-danger"></span>
 
               </div>
@@ -62,17 +137,53 @@
 
               </div>
               <div class="form-group mb-3" style="margin-top: 10px;">
-                <label for="expiry_date_from">Expiry Date From:</label>
+                <label for="expiry_date_from">Valid From:</label>
                 <input type="date" id="expiry_date_from" name="expiry_date_from" class="form-control" required>
                 <span id="expiry_date_from_error" class="text-danger"></span>
 
               </div>
               <div class="form-group mb-3" style="margin-top: 10px;">
-                <label for="expiry_date_to">Expiry Date To:</label>
+                <label for="expiry_date_to">Valid To:</label>
                 <input type="date" id="expiry_date_to" name="expiry_date_to" class="form-control" required>
                 <span id="expiry_date_to_error" class="text-danger"></span>
 
               </div>
+              <div class="form-group mb-3" style="margin-top: 10px;">
+                <label for="opening_time">Opening Time:</label>
+                <input type="time" id="opening_time" name="opening_time" class="form-control">
+                <span id="opening_time_error" class="text-danger"></span>
+            </div>
+        
+            <div class="form-group mb-3" style="margin-top: 10px;">
+                <label for="closing_time">Closing Time:</label>
+                <input type="time" id="closing_time" name="closing_time" class="form-control">
+                <span id="closing_time_error" class="text-danger"></span>
+            </div>
+        
+            <div class="form-group mb-3" style="margin-top: 10px;">
+                <label>Opening Days:</label><br>
+                <input type="checkbox" id="monday" name="opening_days" value="monday">
+                <label for="monday">Monday</label><br>
+                <input type="checkbox" id="tuesday" name="opening_days" value="tuesday">
+                <label for="tuesday">Tuesday</label><br>
+                <input type="checkbox" id="wednesday" name="opening_days" value="wednesday">
+                <label for="wednesday">Wednesday</label><br>
+                <input type="checkbox" id="thursday" name="opening_days" value="thursday">
+                <label for="thursday">Thursday</label><br>
+                <input type="checkbox" id="friday" name="opening_days" value="friday">
+                <label for="friday">Friday</label><br>
+                <input type="checkbox" id="saturday" name="opening_days" value="saturday">
+                <label for="saturday">Saturday</label><br>
+                <input type="checkbox" id="sunday" name="opening_days" value="sunday">
+                <label for="sunday">Sunday</label><br>
+                <span id="opening_days_error" class="text-danger"></span>
+            </div>
+        
+            <div class="form-group mb-3" style="margin-top: 10px;">
+                <label for="store_image">Store Image:</label>
+                <input type="file" id="store_image" name="store_image" accept="image/*">
+                <span id="store_image_error" class="text-danger"></span>
+            </div>
               <button type="submit" class="btn btn-primary">Submit</button>
             </form>
           {% endif %}
@@ -103,15 +214,26 @@
       $("#expiry_date_to").change(function () {
         validateExpiryDateTo("#expiry_date_to");
       });
+      $("#opening_time").change(function () {
+        validateOpeningTimeAndClosingTime();
+      });
+
+      $("#closing_time").change(function () {
+          validateOpeningTimeAndClosingTime();
+      });
+
+      $("#store_image").change(function () {
+        validateStoreImage("#store_image");
+    });
   });  
       function validateCertificationImage(fieldId) {
         var certificationImage = $(fieldId).val().trim();
-        var certificationImageError = $("#certification_image_error");
+        
         if (certificationImage === "") {
         $("#certification_image_error").html("Store License Image is required").css("color", "red");
-          certificationImageError.text("Store License Image is required").css("color", "red");
+          
         } else {
-          $("#certification_image_error").html("").css("color", "red");
+          $("#certification_image_error").html("");
       }
       }
     
@@ -166,7 +288,33 @@
         }
       }
       // Add other validations if needed
-  
+      function validateOpeningTimeAndClosingTime() {
+        var openingTime = $("#opening_time").val().trim();
+        var closingTime = $("#closing_time").val().trim();
+    
+        if (openingTime !== "" && closingTime !== "") {
+            if (openingTime >= closingTime) {
+                $("#opening_time_error").html("Opening time cannot be later than closing time").css("color", "red");
+                $("#closing_time_error").html("Closing time cannot be earlier than opening time").css("color", "red");
+            } else {
+                $("#opening_time_error").html("").css("color", "red");
+                $("#closing_time_error").html("").css("color", "red");
+            }
+        }
+    }
+    function validateStoreImage(fieldId) {
+      var storeImage = $(fieldId).val().trim();
+      var storeImageError = $("#store_image_error");
+
+      if (storeImage === "") {
+          $("#store_image_error").html("Store image is required").css("color", "red");
+          storeImageError.text("Store image is required").css("color", "red");
+      } else {
+          $("#store_image_error").html("").css("color", "red");
+      }
+  }
+
+
     
   
   </script>

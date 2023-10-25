@@ -12,49 +12,15 @@
     <!--  Main wrapper -->
     <div class="body-wrapper">
       <div class="container-fluid">
-        <div class="card" style="border-style: none; box-shadow: black 0px 20px 30px -10px;">
+        <div class="card">
           <div class="card-body">
             <h5 class="card-title fw-semibold mb-4">Add Plant Category</h5>
-            <script>
-              function validateForm() {
-                  const category_nameInput = document.getElementById('category_name');
-                  const category_nameError = document.getElementById('category_name_error');
-                  const category_nameValue = category_nameInput.value.trim();
-          
-                  const category_descriptionInput = document.getElementById('category_description');
-                  const category_descriptionError = document.getElementById('category_description_error');
-                  const category_descriptionValue = category_descriptionInput.value.trim();
-          
-                  let isValid = true;
-          
-                  // Validate Category Name
-                  if (category_nameValue === '') {
-                      category_nameError.textContent = 'Category Name cannot be empty.';
-                      isValid = false;
-                  } else if (!/^[A-Za-z\s]+$/.test(category_nameValue)) {
-                      category_nameError.textContent = 'Category Name should contain only alphabetic characters.';
-                      isValid = false;
-                  } else {
-                      category_nameError.textContent = '';
-                  }
-          
-                  // Validate Category Description
-                  if (category_descriptionValue === '') {
-                    category_descriptionError.textContent = 'Category Description cannot be empty.';
-                    isValid = false;
-                  } 
-                  else if (!/^[A-Za-z\s]*$/.test(category_descriptionValue)) {
-                      category_descriptionError.textContent = 'Category Description should contain only alphabetic characters and spaces.';
-                      isValid = false;
-                  } else {
-                      category_descriptionError.textContent = '';
-                  }
-          
-                  return isValid;
-              }
-          </script>
-          
-          <form method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+                    {% if error_message %}
+                    <div class="alert alert-danger">
+                        {{ error_message }}
+                    </div>
+                    {% endif %}
+            <form method="post" enctype="multipart/form-data" onsubmit="return validateForm()">       
               {% csrf_token %}
               <div class="form-group" style="margin-top: 30px;">
                   <label for="category_name">Category Name:</label>
@@ -66,8 +32,51 @@
                   <textarea id="category_description" name="category_description" class="form-control"></textarea>
                   <span id="category_description_error" class="text-danger"></span>
               </div>
-              <button type="submit" class="btn btn-primary" style="margin-top: 30px;">Create Category</button>
+              {% if form_error_message %}
+                <div id="form_error_message" class="text-danger">{{ form_error_message }}</div> <!-- Display form error message from the view if it's not None -->
+              {% endif %}
+              <button type="submit" class="btn btn-primary">Create</button>
+              <a class="btn btn-dark" style="margin-left:20px" href="{% url 'addcategory' %}">Cancel</a>
           </form>
+          
+          <script>
+            function validateCategoryName() {
+              const categoryNameInput = document.getElementById('category_name');
+              const categoryNameError = document.getElementById('category_name_error');
+              const categoryNameValue = categoryNameInput.value.trim();
+          
+              // Use a regular expression to check for the desired format
+              const categoryFormatRegex = /^[A-Z][a-zA-Z\s]*$/;
+          
+              if (categoryNameValue === "") {
+                  categoryNameError.textContent = 'Category Name is required.';
+              } else if (!categoryFormatRegex.test(categoryNameValue)) {
+                  categoryNameError.textContent = 'Category Name should start with a capital letter and contain only alphabets and spaces.';
+              } else {
+                  categoryNameError.textContent = '';
+              }
+          }          
+          
+              function validateForm() {
+                  validateCategoryName(); // Call the category name validation function
+          
+                  // Check if there are any validation errors
+                  const errorElements = document.querySelectorAll('.text-danger');
+                  for (const errorElement of errorElements) {
+                      if (errorElement.textContent !== '') {
+                          return false; // Prevent form submission if there are validation errors
+                      }
+                  }
+          
+                  return true; // Submit the form if there are no validation errors
+              }
+          
+              // Add an event listener to validate the category name when the input changes
+              const categoryNameInput = document.getElementById('category_name');
+              categoryNameInput.addEventListener('input', validateCategoryName);
+          </script>
+          
+          
           
           </div>
         </div>
