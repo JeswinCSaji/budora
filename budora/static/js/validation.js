@@ -17,15 +17,19 @@ $(document).ready(function () {
 });
    
    function validateName(fieldId) {
-   var name = $(fieldId).val();
-   lettersWithSpaces = /^[A-Za-z\s]+$/;
-   if (name.trim() === "") {
-   $("#fnspan").html("Enter your name").css("color", "red");
-   } else if (!lettersWithSpaces.test(name)) {
-   $("#fnspan").html("only alphabets are allowed").css("color", "red");
-   } else {
-   $("#fnspan").html("");
-   }
+    var name = $(fieldId).val().trim();
+    var fullNameRegex = /^[A-Z][a-z]*(\s[A-Z][a-z]*)*$/;
+    var words = name.split(' ');
+
+    if (name === "") {
+        $("#fnspan").html("Enter your full name and only alphabets are allowed").css("color", "red");
+    } else if (words.length < 2) {
+        $("#fnspan").html("Please enter your full name").css("color", "red");
+    } else if (!fullNameRegex.test(name)) {
+        $("#fnspan").html("Name should start with a capital letter and contain only alphabets and spaces").css("color", "red");
+    } else {
+        $("#fnspan").html("");
+    }
    }
    
    function validateEmail(fieldId) {
@@ -42,21 +46,27 @@ $(document).ready(function () {
    
    function validatePassword(fieldId) {
    var password = $(fieldId).val();
-   var pwd_expression = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-])/;
-    if (password === "") {
-   $("#pspan").html("Enter your password").css("color", "red");
-   }
-   else if(!pwd_expression.test(password))
-    {
-        $("#pspan").html("Uppercase letter, Symbol and number needed").css("color", "red");
-
+   var pattern = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-])/;
+   if (!pattern.test(password)) {
+    if (password.length < 8) {
+        $("#pspan").html("At least 8 characters").css("color", "red");
     }
-    else {
-   $("#pspan").html("");
-   }
-   }
-   
-   function validateConfirmPassword(fieldId) {
+    if (!/[0-9]/.test(password)) {
+        $("#pspan").html("At least 1 number").css("color", "red");
+    }
+    if (!/[!@#$%^&*]/.test(password)) {
+        $("#pspan").html("At least 1 symbol (!@#$%^&*)").css("color", "red");
+        }
+    if (!/[A-Z]/.test(password)) {
+        $("#pspan").html("At least 1 capital letter").css("color", "red");
+    }
+    $("#pspan").html("Invalid password").css("color", "red");
+    }
+    $("#pspan").html("").css("color", "red");
+    }
+  
+   function validateConfirmPassword(fieldId) 
+   {
     var password = $("#pass").val();
    var confirmPassword = $(fieldId).val();
     if (confirmPassword === "") {
@@ -66,4 +76,4 @@ $(document).ready(function () {
    } else {
    $("#cpspan").html("");
    }
-   }
+    }

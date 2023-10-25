@@ -1,3 +1,5 @@
+
+{% extends 'seller/base.html' %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
@@ -11,19 +13,20 @@
   </style>
 </head>
 <body>
-  <div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <!-- Session info and logout link -->
-      <div>
-        <p>{{ request.user.username }} Your Product is Added</p>
-      </div>
-      <div>
-        <p><a href="{% url 'seller_index' %}" class="btn btn-danger">Back</a></p>
-      </div>
-    </div>
-    <h2>We Added your Product to the Product Category and it will be Available to Every Customers to Buy</h2>
+  {% block content %}
+  <div class="container-fluid" >
+    <div class="card"style="border-style: none; box-shadow: black 0px 20px 30px -10px; background-color:white;">
+      <div class="card-body" >
+    <h2>Plant Added</h2>
+    <p>Your Plant has been added successfully.</p>
+      <a href="{% url 'viewaddproduct' %}" class="btn btn-danger">View Plants</a></p>
+
   </div>
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</div>
+</div>
+  {% endblock %}
+
 </body>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </html>

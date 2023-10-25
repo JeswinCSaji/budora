@@ -1,0 +1,325 @@
+{% extends 'seller/base.html' %}
+{% load static %}
+<html>
+<head>
+  <title>Seller Dashboard</title>
+
+</head>
+<style>
+  .certification-message {
+    font-size: 18px;
+    color: #333; /* Text color */
+    background-color: #f0f0f0; /* Background color */
+    padding: 10px; /* Add padding for spacing */
+    border: 1px solid #ccc; /* Add a border */
+    border-radius: 5px; /* Rounded corners */
+    text-align: center; /* Center the text */
+    margin: 20px 0; /* Add margin for spacing */
+}
+</style>
+<body>
+  {% block content %}
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <!--  Main wrapper -->
+    <div class="body-wrapper" >
+      <div class="container-fluid" >
+        <div class="card" style="border-style: none; box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.22) 0px 15px 12px; background-color:white;">
+          <div class="card-body">
+           
+          {% if existing_certification %}
+
+            {% if existing_certification.is_approved == 'pending' %}
+            <h5 class="card-title text-dark fw-semibold mb-4">Store Licence Approval</h5>
+            <p class="certification-message">You have already entered your Licence details.</p>
+
+            {% elif existing_certification.is_approved == 'approved' %}
+            <h5 class="card-title text-dark fw-semibold mb-4">Reviews for {{ existing_certification.store_name }}</h5>
+            <div class="col-md-12 col-xl-12 grid-margin stretch-card">
+              <div class="card-light col-md-12 col-xl-12">
+                <div class="card-body">
+                  <div class="d-flex flex-row justify-content-between">
+                    <h4 class="card-title text-dark"> Overall Rating -
+                        {% with avg_rating_rounded=avg_rating|default:0|floatformat:"0" %}
+                        {% for i in "12345" %}
+                            {% if i <= avg_rating_rounded %}
+                                <small class="fa fa-star text-dark" ></small>
+                            {% else %}
+                                <small class="fa fa-star text-light" ></small>
+                            {% endif %}
+                        {% endfor %}
+                        {% endwith %}
+                    </h4>
+                    {% comment %} <p class="text-muted mb-1 small">View all</p> {% endcomment %}
+                  </div>
+                  {% for review in allreviews %}
+                  <div class="preview-list">
+                    <div class="preview-item border-bottom">
+                      <div class="preview-thumbnail">
+                        {% with review_rating=review.rating|stringformat:"d"|default:0 %}
+                        {% if review.user.userprofile.profile_pic %}
+                        <img src="{{ review.user.userprofile.profile_pic.url }}" alt="image" class="rounded-circle" />
+                        {% else %}
+                        <img src="{% static 'images/usericon.png' %}" alt="image" class="rounded-circle" />
+                        {% endif %}
+                      </div>
+                      <div class="preview-item-content d-flex flex-grow">
+                        <div class="flex-grow">
+                          <div class="d-flex d-md-block d-xl-flex justify-content-between">
+                            <h6 class="preview-subject">{{ review.user.userprofile.name }}</h6>
+                            <p class="text-muted text-small">
+                              {% for i in "12345" %}
+                              {% if i <= review_rating %}
+                                  <small class="fa fa-star text-primary" ></small>
+                              {% else %}
+                                  <small class="fa fa-star text-light" ></small>
+                              {% endif %}
+                              
+                              {% endfor %}
+                              
+                            </p>
+                          </div>
+                          <p class="text-muted">{{ review.description }}</p>
+                          {% endwith %}
+                        </div>
+                      </div>
+                    </div>
+                    
+                  {% empty %}
+                      <div class="preview-item border-bottom">
+                        <div class="preview-thumbnail">
+                        </div>
+                        <div class="preview-item-content d-flex flex-grow">
+                          <div class="flex-grow">
+                            <div class="d-flex d-md-block d-xl-flex justify-content-between">
+                              <h6 class="preview-subject">No reviews available</h6>
+                              
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  {% endfor %}
+                </div>
+              </div>
+            </div>
+          
+             
+
+
+            {% elif existing_certification.is_approved == 'rejected' %}
+            <h5 class="card-title text-dark fw-semibold mb-4">Store Licence Approval</h5>
+            <p class="certification-message">Your Application is rejected.</p>
+            {% else %}
+              <p> Not working </p>                
+            {% endif %}
+          {% else %}
+          <h5 class="card-title text-dark fw-semibold mb-4">Store Licence Approval</h5>
+            <!-- Display the certification form -->
+            <form method="post" enctype="multipart/form-data" >
+              {% csrf_token %}
+              
+              <div class="form-group mb-3" style="margin-top: 10px;">
+                <label for="certification_image">Store License Image:</label>
+                <input type="file" id="certification_image" name="certification_image" accept="image/*" required>
+                <span id="certification_image_error" class="text-danger"></span>
+              </div>
+              <div class="form-group mb-3" style="margin-top: 10px;">
+                <label for="owner_name">Owner Name:</label>
+                <input type="text" id="owner_name" name="owner_name" class="form-control" value="{{ user.seller.name }}" readonly>
+                <span id="owner_name_error" class="text-danger"></span>
+
+              </div>
+              <div class="form-group mb-3" style="margin-top: 10px;">
+                <label for="store_name">Store Name:</label>
+                <input type="text" id="store_name" name="store_name" class="form-control" value="{{ user.seller.storename }}" readonly>
+                <span id="store_name_error" class="text-danger"></span>
+
+              </div>
+              <div class="form-group mb-3" style="margin-top: 10px;">
+                <label for="expiry_date_from">Valid From:</label>
+                <input type="date" id="expiry_date_from" name="expiry_date_from" class="form-control" required>
+                <span id="expiry_date_from_error" class="text-danger"></span>
+
+              </div>
+              <div class="form-group mb-3" style="margin-top: 10px;">
+                <label for="expiry_date_to">Valid To:</label>
+                <input type="date" id="expiry_date_to" name="expiry_date_to" class="form-control" required>
+                <span id="expiry_date_to_error" class="text-danger"></span>
+
+              </div>
+              <div class="form-group mb-3" style="margin-top: 10px;">
+                <label for="opening_time">Opening Time:</label>
+                <input type="time" id="opening_time" name="opening_time" class="form-control">
+                <span id="opening_time_error" class="text-danger"></span>
+            </div>
+        
+            <div class="form-group mb-3" style="margin-top: 10px;">
+                <label for="closing_time">Closing Time:</label>
+                <input type="time" id="closing_time" name="closing_time" class="form-control">
+                <span id="closing_time_error" class="text-danger"></span>
+            </div>
+        
+            <div class="form-group mb-3" style="margin-top: 10px;">
+                <label>Opening Days:</label><br>
+                <input type="checkbox" id="monday" name="opening_days" value="monday">
+                <label for="monday">Monday</label><br>
+                <input type="checkbox" id="tuesday" name="opening_days" value="tuesday">
+                <label for="tuesday">Tuesday</label><br>
+                <input type="checkbox" id="wednesday" name="opening_days" value="wednesday">
+                <label for="wednesday">Wednesday</label><br>
+                <input type="checkbox" id="thursday" name="opening_days" value="thursday">
+                <label for="thursday">Thursday</label><br>
+                <input type="checkbox" id="friday" name="opening_days" value="friday">
+                <label for="friday">Friday</label><br>
+                <input type="checkbox" id="saturday" name="opening_days" value="saturday">
+                <label for="saturday">Saturday</label><br>
+                <input type="checkbox" id="sunday" name="opening_days" value="sunday">
+                <label for="sunday">Sunday</label><br>
+                <span id="opening_days_error" class="text-danger"></span>
+            </div>
+        
+            <div class="form-group mb-3" style="margin-top: 10px;">
+                <label for="store_image">Store Image:</label>
+                <input type="file" id="store_image" name="store_image" accept="image/*">
+                <span id="store_image_error" class="text-danger"></span>
+            </div>
+              <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
+          {% endif %}
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    
+    $(document).ready(function () {
+      $("#certification_image").change(function () {
+        validateCertificationImage("#certification_image");
+      });
+    
+      $("#owner_name").keyup(function () {
+        validateOwnerName("#owner_name");
+      });
+    
+      $("#store_name").keyup(function () {
+        validateStoreName("#store_name");
+      });
+    
+      $("#expiry_date_from").change(function () {
+        validateExpiryDateFrom("#expiry_date_from");
+      });
+    
+      $("#expiry_date_to").change(function () {
+        validateExpiryDateTo("#expiry_date_to");
+      });
+      $("#opening_time").change(function () {
+        validateOpeningTimeAndClosingTime();
+      });
+
+      $("#closing_time").change(function () {
+          validateOpeningTimeAndClosingTime();
+      });
+
+      $("#store_image").change(function () {
+        validateStoreImage("#store_image");
+    });
+  });  
+      function validateCertificationImage(fieldId) {
+        var certificationImage = $(fieldId).val().trim();
+        
+        if (certificationImage === "") {
+        $("#certification_image_error").html("Store License Image is required").css("color", "red");
+          
+        } else {
+          $("#certification_image_error").html("");
+      }
+      }
+    
+      function validateOwnerName(fieldId) {
+        var ownerName = $(fieldId).val().trim();
+        var lettersOnlyPattern = /^[A-Za-z\s]+$/;
+    
+        if (ownerName === "") {
+          $("#owner_name_error").html("Enter your Owner name").css("color", "red");
+        } else if (!lettersOnlyPattern.test(ownerName)) {
+          $("#owner_name_error").html("Owner Name should contain only letters and spaces").css("color", "red");
+       } else {
+          $("#owner_name_error").html("");
+      }
+      }
+    
+      function validateStoreName(fieldId) {
+        var storeName = $(fieldId).val().trim();
+    
+        if (storeName === "") {
+          $("#store_name_error").html("Store Name is required").css("color", "red");
+        } else {
+          $("#store_name_error").html("").css("color", "red");
+        }
+      }
+    
+      function validateExpiryDateFrom(fieldId) {
+        var expiryDateFrom = $(fieldId).val().trim();
+        var datePattern = /^\d{4}-\d{2}-\d{2}$/; // Updated date pattern
+        var today = new Date().toLocaleDateString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' }); // Format the date as "yyyy-mm-dd"
+    
+        if (expiryDateFrom === "") {
+          $("#expiry_date_from_error").html("Expiry Date From is required").css("color", "red");
+        } else if (!datePattern.test(expiryDateFrom) || expiryDateFrom > today) {
+          $("#expiry_date_from_error").html("Expiry Date from should not be after the current date").css("color", "red");
+        } else {
+          $("#expiry_date_from_error").html("").css("color", "red");
+        }
+      }
+    
+      function validateExpiryDateTo(fieldId) {
+        var expiryDateTo = $(fieldId).val().trim();
+        var datePattern = /^\d{4}-\d{2}-\d{2}$/; // Updated date pattern
+        var today = new Date().toLocaleDateString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit' }); // Format the date as "yyyy-mm-dd"
+    
+        if (expiryDateTo === "") {
+          $("#expiry_date_to_error").html("Expiry Date To is required").css("color", "red");
+        } else if (!datePattern.test(expiryDateTo) || expiryDateTo <= today) {
+          $("#expiry_date_to_error").html("Expiry Date from should not be the current date or before the current date").css("color", "red");
+        } else {
+          $("#expiry_date_to_error").html("").css("color", "red");
+        }
+      }
+      // Add other validations if needed
+      function validateOpeningTimeAndClosingTime() {
+        var openingTime = $("#opening_time").val().trim();
+        var closingTime = $("#closing_time").val().trim();
+    
+        if (openingTime !== "" && closingTime !== "") {
+            if (openingTime >= closingTime) {
+                $("#opening_time_error").html("Opening time cannot be later than closing time").css("color", "red");
+                $("#closing_time_error").html("Closing time cannot be earlier than opening time").css("color", "red");
+            } else {
+                $("#opening_time_error").html("").css("color", "red");
+                $("#closing_time_error").html("").css("color", "red");
+            }
+        }
+    }
+    function validateStoreImage(fieldId) {
+      var storeImage = $(fieldId).val().trim();
+      var storeImageError = $("#store_image_error");
+
+      if (storeImage === "") {
+          $("#store_image_error").html("Store image is required").css("color", "red");
+          storeImageError.text("Store image is required").css("color", "red");
+      } else {
+          $("#store_image_error").html("").css("color", "red");
+      }
+  }
+
+
+    
+  
+  </script>
+    {% endblock %}
+
+</body>
+
+</html>

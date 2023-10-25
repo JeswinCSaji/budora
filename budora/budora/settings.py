@@ -126,7 +126,7 @@ USE_I18N = True
 
 USE_TZ = True
 
-
+LOGIN_REDIRECT_URL='login.html'
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
@@ -146,9 +146,9 @@ EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'mailtoshowvalidationok@gmail.com' 
-EMAIL_HOST_PASSWORD = 'qtwpnirvgsxzhtdo' 
-DEFAULT_FROM_EMAIL = 'mailtoshowvalidationok@gmail.com'
+EMAIL_HOST_USER = 'jeswin1j1@gmail.com' 
+EMAIL_HOST_PASSWORD = 'hqqs yjgn fclf qbfn' 
+DEFAULT_FROM_EMAIL = 'jeswin1j1@gmail.com'
 
 SITE_ID = 1
 
@@ -160,10 +160,31 @@ AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 8,  
+        }
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
 ACCOUNT_EMAIL_VERIFICATION = 'none'
 
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
 
+LOGIN_URL = 'http://127.0.0.1:8000/login.html'
 SOCIALACCOUNT_LOGIN_ON_GET=True
 ACCOUNT_EMAIL_VERIFICATION='none'
+
+RAZOR_KEY_ID = 'rzp_test_ckD8vKtwmQUFT9'
+RAZOR_KEY_SECRET = 'kLS1G5OucdRAs2QeFLbfLGVs'
