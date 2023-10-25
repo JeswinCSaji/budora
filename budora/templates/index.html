@@ -105,15 +105,21 @@
                         <div class="nav-item dropdown" id="logz">
                             {% if user.userprofile.profile_pic %}
 					        <img src="{{ user.userprofile.profile_pic.url }}" alt=""  width="30" height="30" style=" box-shadow: rgba(50, 50, 93, 0.25) 0px 6px 12px -2px, rgba(0, 0, 0, 0.3) 0px 3px 7px -3px; margin-top:20px;" class="rounded-circle animated zoomIn" >
+                            <p class="text animated zoomIn" style=" margin-left : 45px; margin-top : -28px;color: #27350F;">  {{ user.userprofile.name }}</p>
 					        {% else %}
                             <a href="#" class="nav-link dropdown-toggle text animated zoomIn" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user-circle"></i></a>
+                            <p class="text animated zoomIn" style=" margin-left : 45px; margin-top : -28px;color: #27350F;">  {{ user.userprofile.name }}</p>
+
 					        {% endif %}
                             <div class="dropdown-menu bg-light rounded-0 m-0">
-                                <p class="dropdown-item">{{ user.userprofile.name }}</p>
+                               
                                 <a href="{% url 'profile' %}" class="dropdown-item">Profile</a>
                                 <a href="{% url 'orders' %}" class="dropdown-item">Orders</a>
                                 <a href="#" class="dropdown-item" onclick="confirmLogout();" id="logoutt" >Logout <i class="fa fa-arrow-right"></i></a>
-                            </div>
+                            </div> 
+                            
+
+                           
                         </div>
                         {% else %}
                         <a  class="nav-item nav-link text animated zoomIn" href="{% url 'loginu' %}">Login <i class="fa fa-arrow-right"></i></a>
@@ -188,7 +194,11 @@
     <!-- Carousel Start -->
     <div class="container-fluid px-0 mb-5" >
         {% if user.is_authenticated %}
+        
         <h1 class=" text animated zoomIn" style="font-family: sans-serif; text-align: left; font-size: x-large; margin-left: 8%; font-weight: lighter;">Welcome,<p>{{ user.userprofile.name }}</p></h1>
+
+        {% comment %} <h1 class=" text animated zoomIn" style="font-family: sans-serif; text-align: left; font-size: x-large; margin-left: 8%; font-weight: lighter;">Welcome,<p style="max-width:180px;  color: white; background-color: #27350F; padding-left:40px;box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0,0, 0, 0.23) 0px 3px 6px;">{{ user.userprofile.name }}</p></h1> {% endcomment %}
+
         {% endif %}
         <div id="header-carousel" class="carousel slide carousel-fade" data-bs-ride="carousel" >
             <div class="carousel-inner">
