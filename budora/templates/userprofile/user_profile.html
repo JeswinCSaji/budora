@@ -62,33 +62,42 @@
     {% elif user.is_staff %}
     <div class="container-fluid sticky-top">
         <div class="container">
-        <nav class="navbar navbar-expand-lg navbar-light py-2 py-lg-2 ">
-            <a href="index.html" class="navbar-brand animated rubberBand" id="budoralogo" >
-                <img class="img-fluid" src="{% static 'images/8.png' %}" alt="Logo">
-                <a id="logoname" class="animated rubberBand"  href="#">BUDORA </a>
+        <nav class="navbar navbar-expand-lg py-2 py-lg-2 ">
+            <a href="" class="navbar-brand animated rubberBand" id="budoralogo" >
+                <img class="img-fluid" id="logotext" src="{% static 'images/8.png' %}" alt="Logo" >
+                <a id="logoname" class="animated rubberBand" href="#">BUDORA </a>
             </a>
+            <p style="margin-left: 8%; margin-top: 1.5%; color: white; background-color: #27350F; padding:7;box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;" class="text animated rubberBand">Seller : {{ user.seller.name }}</p>
             <button type="button" class="navbar-toggler ms-auto me-0" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
-                <span class="navbar-toggler-icon"></span>
+                <span class="fa fa-bars" ></span>
             </button>
                 <div class="collapse navbar-collapse" id="navbarCollapse">
                     
                     <div class="navbar-nav ms-auto" style="text-decoration: none;
                             text-shadow: rgba(1, 1, 1, 0.25) 0px 14px 28px, rgba(1, 1, 1, 0.22) 0px 3px 3px;">
-                            <a href="{% url 'seller_index' %}" class="nav-item nav-link  text animated pulse" style="font-weight: lighter;">Licence Approval</a>
-                            <a href="{% url 'addproducts' %}" class="nav-item nav-link text animated pulse" style="font-weight: lighter;">Add Products</a>
-                            <a href="{% url 'viewaddproduct' %}" class="nav-item nav-link text animated pulse" style="font-weight: lighter;">View Products</a>
-                        
+                            <a href="{% url 'seller_index' %}" class="nav-item nav-link  text animated pulse" style="font-weight: lighter;">Dashboard</a>
+                            <a href="{% url 'addproducts' %}" class="nav-item nav-link text animated pulse" style="font-weight: lighter;">Add Plants</a>
+                            <a href="{% url 'viewaddproduct' %}" class="nav-item nav-link text animated pulse" style="font-weight: lighter;">View Plants</a>
+                            <a href="{% url 'sellerorder' %}" class="nav-item nav-link text animated pulse" style="font-weight: lighter;">View Orders</a>
+
                                 {% if user.is_authenticated %}
-                                <div class="nav-item dropdown text animated zoomIn" style="margin-left: 50px;">
-                                    <a href="#" class="nav-link dropdown-toggle text animated pulse" data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user-circle"></i></a>
-                                    <div class="dropdown-menu bg-light rounded-0 m-0">
-                                        <p class="dropdown-item">{{ user.userprofile.name }}</p>
-                                        <a href="{% url 'profile' %}" class="dropdown-item">Profile</a>
-                                        <a href="{% url 'seller_loggout' %}" class="dropdown-item">Logout</a>
+                                <div class="nav-item dropdown text animated pulse" style="margin-left: 50px;">
+                                {% if user.userprofile.profile_pic %}
+					            <img src="{{ user.userprofile.profile_pic.url }}" alt="" width="35" height="35" style="margin-top:20px" class="rounded-circle">
+
+
+					            {% else %}
+                                <a href="#" class="nav-link dropdown-toggle text animated zoomIn"  data-bs-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><i class="fa fa-user-circle"></i></a>
+  
+					            {% endif %}
+                                    <div class="dropdown-menu bg-dark rounded-0 m-0">
+                                       
+                                        <a href="{% url 'profile' %}"   style="color:grey;" class="dropdown-item">Profile</a>
+                                        <a  onclick="confirmLogout();"   style="color:grey;" class="dropdown-item">Logout</a>
                                     </div>
                                 </div>
                                 {% else %}
-                                <a  class="nav-item nav-link" href="{% url 'loginu' %}" style="font-weight: lighter;">Login <i class="fa fa-arrow-right"></i></a>
+                                <a  class="nav-item nav-link text animated pulse" href="{% url 'loginu' %}" style="font-weight: lighter;">Login <i class="fa fa-arrow-right"></i></a>
                                 {% endif %} 
                     </div>
                 </div>

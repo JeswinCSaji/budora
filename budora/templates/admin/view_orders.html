@@ -40,7 +40,7 @@
                                 <th>Payment Status</th>
                                 <th>Customer Status</th>
                                 <th>Seller Status</th>
-                                <th>Payment</th>
+                                {% comment %} <th>Payment</th> {% endcomment %}
                             </tr>
                         </thead>
                         <tbody>
@@ -77,9 +77,9 @@
                                             <label class="badge badge-success">Success</label>
                                         {% endif %}
                                     </td>
-                                    <td>
+                                    {% comment %} <td>
                                         <a id="paybtn" href=" " class="btn btn-inverse-success btn-fw">Pay</a>
-                                    </td>
+                                    </td> {% endcomment %}
 
                                 </tr>
                             {% empty %}

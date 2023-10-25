@@ -71,6 +71,8 @@ class Hosttest(TestCase):
         budora=driver.find_element(By.CSS_SELECTOR,'#stock')
         budora.click()
         time.sleep(2)
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(2)
         budora=driver.find_element(By.CSS_SELECTOR,'#approvestock')
         budora.click()
         time.sleep(2)
