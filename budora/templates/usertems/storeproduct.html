@@ -103,7 +103,7 @@
                                             <li>
                                                 <div class="review">
                                                     {% if review.user.userprofile.profile_pic %}
-                                                    <img src="{{ review.user.userprofile.profile_pic.url }}" alt="image" class="rounded-circle" width="20" style="margin-right:10px;"/>
+                                                    <img src="{{ review.user.userprofile.profile_pic.url }}" alt="image" class="rounded-circle" width="20"  style="margin-right:10px;"/>
                                                     {% else %}
                                                     <img src="{% static 'images/usericon.png' %}" alt="image" class="rounded-circle" />
                                                     {% endif %}

@@ -16,13 +16,13 @@
                         <th>Order Date</th>
                         <th>Payment</th>
                         <th>Customer Status</th>
-                        <th>Your Status</th>
+                        <th>Product Sold</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for order_item in seller_orders %}
                         <tr>
-                            <td>{{ order_item.order.user.username }}</td>
+                            <td>{{ order_item.order.user.userprofile.name }}</td>
                             <td>{{ order_item.product.product_name }} * {{ order_item.quantity }}</td>
                             <td>${{ order_item.price }}</td>
                             <td>${{ order_item.total_price }}</td>
@@ -45,7 +45,7 @@
                                 {% if order_item.seller_is_approved == 'pending' %}
                                 <form method="post" action="{% url 'seller_approve_order' order_item.id %}">
                                     {% csrf_token %}
-                                    <button class="btn btn-inverse-success btn-fw" type="submit" >Approve</button>
+                                    <button class="btn btn-inverse-success btn-fw" type="submit" >Confirm</button>
                                 </form>
                                 {% else %}
                                 <label class="badge badge-success">Approved</label>

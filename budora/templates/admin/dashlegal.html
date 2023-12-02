@@ -49,7 +49,8 @@
                         <td>{{ application.store_name }}</td>
                         <td>{{ application.expiry_date_from }}</td>
                         {% if application.expiry_date_to < today %}
-                            <td class="text-danger" >{{ application.expiry_date_to }}</td>
+                            {% comment %} <td class="text-danger" >{{ application.expiry_date_to }}</td> {% endcomment %}
+                            <td>{{ application.expiry_date_to }}</td>
                         {% else %}
                             <td>{{ application.expiry_date_to }}</td>
                         {% endif %}

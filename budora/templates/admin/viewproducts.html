@@ -74,7 +74,7 @@
                             <tr>
                                 <td>{{ product.product_name }}</td>
                                 <td>{{ product.category.category_name }}</td>
-                                <td>${{ product.product_price }}</td>
+                                <td>Rs {{ product.product_price }}</td>
                                 {% if product.product_stock > 10 %}
                                     <td>{{ product.product_stock }}</td>                                    
                                 {% else %}
